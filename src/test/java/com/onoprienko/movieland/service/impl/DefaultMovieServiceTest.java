@@ -1,20 +1,18 @@
 package com.onoprienko.movieland.service.impl;
 
 import com.onoprienko.movieland.entity.Movie;
+import com.onoprienko.movieland.repository.cache.MovieCache;
 import com.onoprienko.movieland.repository.dao.MovieDao;
 import com.onoprienko.movieland.service.MovieService;
-import com.onoprienko.movieland.service.entity.MovieCache;
 import com.onoprienko.movieland.service.entity.PageRequest;
 import com.onoprienko.movieland.service.entity.SortEnum;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DefaultMovieServiceTest {
     Movie testMovieOne = Movie.builder()
@@ -39,7 +37,7 @@ class DefaultMovieServiceTest {
 
 
     MovieDao movieDao = Mockito.mock(MovieDao.class);
-    MovieService movieService = new DefaultMovieService(movieDao, new MovieCache());
+    MovieService movieService = new DefaultMovieService(movieDao, new MovieCache(movieDao));
 
 
     @Test
@@ -368,133 +366,10 @@ class DefaultMovieServiceTest {
                 .findAllByGenre(Mockito.anyInt(), Mockito.any(PageRequest.class));
     }
 
-    @Test
-    void updateMovieCacheWorkCorrect() {
-        MovieCache movieCache = new MovieCache();
-        DefaultMovieService defaultMovieService = new DefaultMovieService(movieDao, movieCache);
-        Mockito.when(
-                movieDao.findAll(
-                        Mockito.any(PageRequest.class)
-                )
-        ).thenReturn(movies);
-
-        assertNull(movieCache.getMovieCache());
-
-        defaultMovieService.updateMovieCache();
-
-        HashMap<Integer, Movie> updatedMovieCache = movieCache.getMovieCache();
-
-        assertNotNull(updatedMovieCache);
-        assertEquals(updatedMovieCache.size(), 2);
-
-        Movie movieOne = updatedMovieCache.get(0);
-        Movie movieTwo = updatedMovieCache.get(1);
-
-
-        assertEquals(movieOne.getId(), 1);
-        assertEquals(movieOne.getPrice(), 55.8);
-        assertEquals(movieOne.getRating(), 7.3);
-        assertEquals(movieOne.getNameNative(), "Test one");
-        assertEquals(movieOne.getNameRussian(), "Тест один");
-        assertEquals(movieOne.getYearOfRelease(), 1900);
-        assertEquals(movieOne.getPicturePath(), "path");
-
-        assertEquals(movieTwo.getId(), 2);
-        assertEquals(movieTwo.getPrice(), 111.1);
-        assertEquals(movieTwo.getRating(), 9.8);
-        assertEquals(movieTwo.getNameNative(), "Test two");
-        assertEquals(movieTwo.getNameRussian(), "Тест два");
-        assertEquals(movieTwo.getYearOfRelease(), 2000);
-        assertEquals(movieTwo.getPicturePath(), "path");
-
-        Mockito.verify(movieDao, Mockito.times(1))
-                .findAll( Mockito.any(PageRequest.class));
-
-    }
-
-
-    @Test
-    void updateNotVoidMovieCacheWithVoidListWorkCorrect() {
-        MovieCache movieCache = new MovieCache();
-        DefaultMovieService defaultMovieService = new DefaultMovieService(movieDao, movieCache);
-        Mockito.when(
-                movieDao.findAll(
-                        Mockito.any(PageRequest.class)
-                )
-        ).thenReturn(movies).thenReturn(new ArrayList<>());
-
-        assertNull(movieCache.getMovieCache());
-        defaultMovieService.updateMovieCache();
-
-        HashMap<Integer, Movie> updatedMovieCache = movieCache.getMovieCache();
-
-        assertNotNull(updatedMovieCache);
-        assertEquals(updatedMovieCache.size(), 2);
-
-        defaultMovieService.updateMovieCache();
-
-        HashMap<Integer, Movie> voidMovieCache = movieCache.getMovieCache();
-
-        assertNotNull(voidMovieCache);
-        assertTrue(voidMovieCache.isEmpty());
-
-        Mockito.verify(movieDao, Mockito.times(2))
-                .findAll( Mockito.any(PageRequest.class));
-
-    }
-
-    @Test
-    void updateVoidMovieCacheWithVoidListWorkCorrect() {
-        MovieCache movieCache = new MovieCache();
-        DefaultMovieService defaultMovieService = new DefaultMovieService(movieDao, movieCache);
-        Mockito.when(
-                movieDao.findAll(
-                        Mockito.any(PageRequest.class)
-                )
-        ).thenReturn(new ArrayList<>()).thenReturn(new ArrayList<>());
-
-        assertNull(movieCache.getMovieCache());
-        defaultMovieService.updateMovieCache();
-
-        HashMap<Integer, Movie> updatedMovieCache = movieCache.getMovieCache();
-
-        assertNotNull(updatedMovieCache);
-        assertTrue(updatedMovieCache.isEmpty());
-
-        defaultMovieService.updateMovieCache();
-
-        HashMap<Integer, Movie> voidMovieCache = movieCache.getMovieCache();
-
-        assertNotNull(voidMovieCache);
-        assertTrue(voidMovieCache.isEmpty());
-
-        Mockito.verify(movieDao, Mockito.times(2))
-                .findAll( Mockito.any(PageRequest.class));
-
-    }
-
-    @Test
-    void updateCacheThrowException() {
-        MovieCache movieCache = new MovieCache();
-        DefaultMovieService defaultMovieService = new DefaultMovieService(movieDao, movieCache);
-        Mockito.when(
-                movieDao.findAll(
-                        Mockito.any(PageRequest.class)
-                )
-        ).thenThrow(new RuntimeException());
-
-        assertNull(movieCache.getMovieCache());
-
-        assertThrows(RuntimeException.class, defaultMovieService::updateMovieCache);
-
-        Mockito.verify(movieDao, Mockito.times(1))
-                .findAll( Mockito.any(PageRequest.class));
-
-    }
 
     @Test
     void findRandomFromCacheWithSameValuesReturnCorrectResult() {
-        MovieCache movieCache = new MovieCache();
+        MovieCache movieCache = new MovieCache(movieDao);
         DefaultMovieService defaultMovieService = new DefaultMovieService(movieDao, movieCache);
         defaultMovieService.setRandomPageCapacity(3);
         Mockito.when(
@@ -502,7 +377,7 @@ class DefaultMovieServiceTest {
                         Mockito.any(PageRequest.class)
                 )
         ).thenReturn(List.of(testMovieOne, testMovieOne, testMovieOne));
-        defaultMovieService.updateMovieCache();
+        movieCache.updateMovieCache();
 
         List<Movie> random = defaultMovieService.findRandom();
         assertNotNull(random);
@@ -530,7 +405,7 @@ class DefaultMovieServiceTest {
 
     @Test
     void findRandomFromCacheReturnCorrectResult() {
-        MovieCache movieCache = new MovieCache();
+        MovieCache movieCache = new MovieCache(movieDao);
         DefaultMovieService defaultMovieService = new DefaultMovieService(movieDao, movieCache);
         defaultMovieService.setRandomPageCapacity(2);
         Mockito.when(
@@ -538,7 +413,7 @@ class DefaultMovieServiceTest {
                         Mockito.any(PageRequest.class)
                 )
         ).thenReturn(movies);
-        defaultMovieService.updateMovieCache();
+        movieCache.updateMovieCache();
 
         List<Movie> random = defaultMovieService.findRandom();
         assertNotNull(random);
@@ -548,7 +423,7 @@ class DefaultMovieServiceTest {
 
     @Test
     void findRandomFromCacheReturnVoidListIfPageCapacityZero() {
-        MovieCache movieCache = new MovieCache();
+        MovieCache movieCache = new MovieCache(movieDao);
         DefaultMovieService defaultMovieService = new DefaultMovieService(movieDao, movieCache);
         defaultMovieService.setRandomPageCapacity(0);
         Mockito.when(
@@ -556,7 +431,7 @@ class DefaultMovieServiceTest {
                         Mockito.any(PageRequest.class)
                 )
         ).thenReturn(movies);
-        defaultMovieService.updateMovieCache();
+        movieCache.updateMovieCache();
 
         List<Movie> random = defaultMovieService.findRandom();
         assertNotNull(random);
@@ -566,14 +441,14 @@ class DefaultMovieServiceTest {
 
     @Test
     void findRandomFromOneItemCacheReturnException() {
-        MovieCache movieCache = new MovieCache();
+        MovieCache movieCache = new MovieCache(movieDao);
         DefaultMovieService defaultMovieService = new DefaultMovieService(movieDao, movieCache);
         Mockito.when(
                 movieDao.findAll(
                         Mockito.any(PageRequest.class)
                 )
         ).thenReturn(List.of(testMovieOne));
-        defaultMovieService.updateMovieCache();
+        movieCache.updateMovieCache();
 
         assertThrows(IllegalArgumentException.class, defaultMovieService::findRandom);
     }

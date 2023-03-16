@@ -21,7 +21,8 @@
         </encoder>
     </appender>
 
-    <logger name="com.onoprienko.movieland" level="DEBUG" additivity="false">
+    <logger name="com.onoprienko.movieland" level="DEBUG" additivity="true">
+        <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </logger>
 
