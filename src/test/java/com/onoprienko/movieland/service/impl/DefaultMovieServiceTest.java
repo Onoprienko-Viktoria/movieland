@@ -60,21 +60,21 @@ class DefaultMovieServiceTest {
         MovieDto movieTwo = all.get(1);
 
 
-        assertEquals(movieOne.getId(), 1);
-        assertEquals(movieOne.getPrice(), 55.8);
-        assertEquals(movieOne.getRating(), 7.3);
-        assertEquals(movieOne.getNameNative(), "Test one");
-        assertEquals(movieOne.getNameRussian(), "Тест один");
-        assertEquals(movieOne.getYearOfRelease(), 1900);
-        assertEquals(movieOne.getPicturePath(), "path");
+        assertEquals(1, movieOne.getId());
+        assertEquals(55.8, movieOne.getPrice());
+        assertEquals(7.3, movieOne.getRating());
+        assertEquals("Test one", movieOne.getNameNative());
+        assertEquals("Тест один", movieOne.getNameRussian());
+        assertEquals(1900, movieOne.getYearOfRelease());
+        assertEquals("path", movieOne.getPicturePath());
 
-        assertEquals(movieTwo.getId(), 2);
-        assertEquals(movieTwo.getPrice(), 111.1);
-        assertEquals(movieTwo.getRating(), 9.8);
-        assertEquals(movieTwo.getNameNative(), "Test two");
-        assertEquals(movieTwo.getNameRussian(), "Тест два");
-        assertEquals(movieTwo.getYearOfRelease(), 2000);
-        assertEquals(movieTwo.getPicturePath(), "path");
+        assertEquals(2, movieTwo.getId());
+        assertEquals(111.1, movieTwo.getPrice());
+        assertEquals(9.8, movieTwo.getRating());
+        assertEquals("Test two", movieTwo.getNameNative());
+        assertEquals("Тест два", movieTwo.getNameRussian());
+        assertEquals(2000, movieTwo.getYearOfRelease());
+        assertEquals("path", movieTwo.getPicturePath());
 
         Mockito.verify(repository, Mockito.times(1))
                 .findAll(Mockito.any(Pageable.class));
@@ -104,21 +104,21 @@ class DefaultMovieServiceTest {
         MovieDto movieTwo = all.get(0);
 
 
-        assertEquals(movieOne.getId(), 1);
-        assertEquals(movieOne.getPrice(), 55.8);
-        assertEquals(movieOne.getRating(), 7.3);
-        assertEquals(movieOne.getNameNative(), "Test one");
-        assertEquals(movieOne.getNameRussian(), "Тест один");
-        assertEquals(movieOne.getYearOfRelease(), 1900);
-        assertEquals(movieOne.getPicturePath(), "path");
+        assertEquals(1, movieOne.getId());
+        assertEquals(55.8, movieOne.getPrice());
+        assertEquals(7.3, movieOne.getRating());
+        assertEquals("Test one", movieOne.getNameNative());
+        assertEquals("Тест один", movieOne.getNameRussian());
+        assertEquals(1900, movieOne.getYearOfRelease());
+        assertEquals("path", movieOne.getPicturePath());
 
-        assertEquals(movieTwo.getId(), 2);
-        assertEquals(movieTwo.getPrice(), 111.1);
-        assertEquals(movieTwo.getRating(), 9.8);
-        assertEquals(movieTwo.getNameNative(), "Test two");
-        assertEquals(movieTwo.getNameRussian(), "Тест два");
-        assertEquals(movieTwo.getYearOfRelease(), 2000);
-        assertEquals(movieTwo.getPicturePath(), "path");
+        assertEquals(2, movieTwo.getId());
+        assertEquals(111.1, movieTwo.getPrice());
+        assertEquals(9.8, movieTwo.getRating());
+        assertEquals("Test two", movieTwo.getNameNative());
+        assertEquals("Тест два", movieTwo.getNameRussian());
+        assertEquals(2000, movieTwo.getYearOfRelease());
+        assertEquals("path", movieTwo.getPicturePath());
 
         Mockito.verify(repository, Mockito.times(1))
                 .findAll(Mockito.any(Pageable.class));
@@ -146,21 +146,21 @@ class DefaultMovieServiceTest {
         MovieDto movieTwo = all.get(1);
 
 
-        assertEquals(movieOne.getId(), 1);
-        assertEquals(movieOne.getPrice(), 55.8);
-        assertEquals(movieOne.getRating(), 7.3);
-        assertEquals(movieOne.getNameNative(), "Test one");
-        assertEquals(movieOne.getNameRussian(), "Тест один");
-        assertEquals(movieOne.getYearOfRelease(), 1900);
-        assertEquals(movieOne.getPicturePath(), "path");
+        assertEquals(1, movieOne.getId());
+        assertEquals(55.8, movieOne.getPrice());
+        assertEquals(7.3, movieOne.getRating());
+        assertEquals("Test one", movieOne.getNameNative());
+        assertEquals("Тест один", movieOne.getNameRussian());
+        assertEquals(1900, movieOne.getYearOfRelease());
+        assertEquals("path", movieOne.getPicturePath());
 
-        assertEquals(movieTwo.getId(), 2);
-        assertEquals(movieTwo.getPrice(), 111.1);
-        assertEquals(movieTwo.getRating(), 9.8);
-        assertEquals(movieTwo.getNameNative(), "Test two");
-        assertEquals(movieTwo.getNameRussian(), "Тест два");
-        assertEquals(movieTwo.getYearOfRelease(), 2000);
-        assertEquals(movieTwo.getPicturePath(), "path");
+        assertEquals(2, movieTwo.getId());
+        assertEquals(111.1, movieTwo.getPrice());
+        assertEquals(9.8, movieTwo.getRating());
+        assertEquals("Test two", movieTwo.getNameNative());
+        assertEquals("Тест два", movieTwo.getNameRussian());
+        assertEquals(2000, movieTwo.getYearOfRelease());
+        assertEquals("path", movieTwo.getPicturePath());
 
         Mockito.verify(repository, Mockito.times(1))
                 .findAll(Mockito.any(Pageable.class));
@@ -188,21 +188,21 @@ class DefaultMovieServiceTest {
         MovieDto movieTwo = all.get(0);
 
 
-        assertEquals(movieOne.getId(), 1);
-        assertEquals(movieOne.getPrice(), 55.8);
-        assertEquals(movieOne.getRating(), 7.3);
-        assertEquals(movieOne.getNameNative(), "Test one");
-        assertEquals(movieOne.getNameRussian(), "Тест один");
-        assertEquals(movieOne.getYearOfRelease(), 1900);
-        assertEquals(movieOne.getPicturePath(), "path");
+        assertEquals(1, movieOne.getId());
+        assertEquals(55.8, movieOne.getPrice());
+        assertEquals(7.3, movieOne.getRating());
+        assertEquals("Test one", movieOne.getNameNative());
+        assertEquals("Тест один", movieOne.getNameRussian());
+        assertEquals(1900, movieOne.getYearOfRelease());
+        assertEquals("path", movieOne.getPicturePath());
 
-        assertEquals(movieTwo.getId(), 2);
-        assertEquals(movieTwo.getPrice(), 111.1);
-        assertEquals(movieTwo.getRating(), 9.8);
-        assertEquals(movieTwo.getNameNative(), "Test two");
-        assertEquals(movieTwo.getNameRussian(), "Тест два");
-        assertEquals(movieTwo.getYearOfRelease(), 2000);
-        assertEquals(movieTwo.getPicturePath(), "path");
+        assertEquals(2, movieTwo.getId());
+        assertEquals(111.1, movieTwo.getPrice());
+        assertEquals(9.8, movieTwo.getRating());
+        assertEquals("Test two", movieTwo.getNameNative());
+        assertEquals("Тест два", movieTwo.getNameRussian());
+        assertEquals(2000, movieTwo.getYearOfRelease());
+        assertEquals("path", movieTwo.getPicturePath());
 
         Mockito.verify(repository, Mockito.times(1))
                 .findAll(Mockito.any(Pageable.class));
@@ -232,21 +232,21 @@ class DefaultMovieServiceTest {
         MovieDto movieTwo = all.get(1);
 
 
-        assertEquals(movieOne.getId(), 1);
-        assertEquals(movieOne.getPrice(), 55.8);
-        assertEquals(movieOne.getRating(), 7.3);
-        assertEquals(movieOne.getNameNative(), "Test one");
-        assertEquals(movieOne.getNameRussian(), "Тест один");
-        assertEquals(movieOne.getYearOfRelease(), 1900);
-        assertEquals(movieOne.getPicturePath(), "path");
+        assertEquals(1, movieOne.getId());
+        assertEquals(55.8, movieOne.getPrice());
+        assertEquals(7.3, movieOne.getRating());
+        assertEquals("Test one", movieOne.getNameNative());
+        assertEquals("Тест один", movieOne.getNameRussian());
+        assertEquals(1900, movieOne.getYearOfRelease());
+        assertEquals("path", movieOne.getPicturePath());
 
-        assertEquals(movieTwo.getId(), 2);
-        assertEquals(movieTwo.getPrice(), 111.1);
-        assertEquals(movieTwo.getRating(), 9.8);
-        assertEquals(movieTwo.getNameNative(), "Test two");
-        assertEquals(movieTwo.getNameRussian(), "Тест два");
-        assertEquals(movieTwo.getYearOfRelease(), 2000);
-        assertEquals(movieTwo.getPicturePath(), "path");
+        assertEquals(2, movieTwo.getId());
+        assertEquals(111.1, movieTwo.getPrice());
+        assertEquals(9.8, movieTwo.getRating());
+        assertEquals("Test two", movieTwo.getNameNative());
+        assertEquals("Тест два", movieTwo.getNameRussian());
+        assertEquals(2000, movieTwo.getYearOfRelease());
+        assertEquals("path", movieTwo.getPicturePath());
 
         Mockito.verify(repository, Mockito.times(1))
                 .findAll(Mockito.any(Pageable.class));
@@ -312,21 +312,21 @@ class DefaultMovieServiceTest {
         MovieDto movieTwo = all.get(1);
 
 
-        assertEquals(movieOne.getId(), 1);
-        assertEquals(movieOne.getPrice(), 55.8);
-        assertEquals(movieOne.getRating(), 7.3);
-        assertEquals(movieOne.getNameNative(), "Test one");
-        assertEquals(movieOne.getNameRussian(), "Тест один");
-        assertEquals(movieOne.getYearOfRelease(), 1900);
-        assertEquals(movieOne.getPicturePath(), "path");
+        assertEquals(1, movieOne.getId());
+        assertEquals(55.8, movieOne.getPrice());
+        assertEquals(7.3, movieOne.getRating());
+        assertEquals("Test one", movieOne.getNameNative());
+        assertEquals("Тест один", movieOne.getNameRussian());
+        assertEquals(1900, movieOne.getYearOfRelease());
+        assertEquals("path", movieOne.getPicturePath());
 
-        assertEquals(movieTwo.getId(), 2);
-        assertEquals(movieTwo.getPrice(), 111.1);
-        assertEquals(movieTwo.getRating(), 9.8);
-        assertEquals(movieTwo.getNameNative(), "Test two");
-        assertEquals(movieTwo.getNameRussian(), "Тест два");
-        assertEquals(movieTwo.getYearOfRelease(), 2000);
-        assertEquals(movieTwo.getPicturePath(), "path");
+        assertEquals(2, movieTwo.getId());
+        assertEquals(111.1, movieTwo.getPrice());
+        assertEquals(9.8, movieTwo.getRating());
+        assertEquals("Test two", movieTwo.getNameNative());
+        assertEquals("Тест два", movieTwo.getNameRussian());
+        assertEquals(2000, movieTwo.getYearOfRelease());
+        assertEquals("path", movieTwo.getPicturePath());
 
         Mockito.verify(repository, Mockito.times(1))
                 .findByGenreId(Mockito.anyLong(), Mockito.any(Pageable.class));
@@ -384,22 +384,22 @@ class DefaultMovieServiceTest {
         assertEquals(random.size(), 3);
         MovieDto movieOne = random.get(0);
 
-        assertEquals(movieOne.getId(), 1);
-        assertEquals(movieOne.getPrice(), 55.8);
-        assertEquals(movieOne.getRating(), 7.3);
-        assertEquals(movieOne.getNameNative(), "Test one");
-        assertEquals(movieOne.getNameRussian(), "Тест один");
-        assertEquals(movieOne.getYearOfRelease(), 1900);
-        assertEquals(movieOne.getPicturePath(), "path");
+        assertEquals(1, movieOne.getId());
+        assertEquals(55.8, movieOne.getPrice());
+        assertEquals(7.3, movieOne.getRating());
+        assertEquals("Test one", movieOne.getNameNative());
+        assertEquals("Тест один", movieOne.getNameRussian());
+        assertEquals(1900, movieOne.getYearOfRelease());
+        assertEquals("path", movieOne.getPicturePath());
 
         MovieDto movieTwo = random.get(1);
 
-        assertEquals(movieTwo.getId(), 1);
-        assertEquals(movieTwo.getPrice(), 55.8);
-        assertEquals(movieTwo.getRating(), 7.3);
-        assertEquals(movieTwo.getNameNative(), "Test one");
-        assertEquals(movieTwo.getNameRussian(), "Тест один");
-        assertEquals(movieTwo.getYearOfRelease(), 1900);
-        assertEquals(movieTwo.getPicturePath(), "path");
+        assertEquals(1, movieOne.getId());
+        assertEquals(55.8, movieOne.getPrice());
+        assertEquals(7.3, movieOne.getRating());
+        assertEquals("Test one", movieOne.getNameNative());
+        assertEquals("Тест один", movieOne.getNameRussian());
+        assertEquals(1900, movieOne.getYearOfRelease());
+        assertEquals("path", movieOne.getPicturePath());
     }
 }

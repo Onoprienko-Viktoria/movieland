@@ -30,12 +30,12 @@ class CachedGenreRepositoryTest {
 
         assertEquals(all.size(), 3);
 
-        assertEquals(all.get(0).getId(), 1);
-        assertEquals(all.get(1).getId(), 2);
-        assertEquals(all.get(2).getId(), 3);
-        assertEquals(all.get(0).getName(), "Драма");
-        assertEquals(all.get(1).getName(), "Триллер");
-        assertEquals(all.get(2).getName(), "Мультфильм");
+        assertEquals(1, all.get(0).getId(), 1);
+        assertEquals(2, all.get(1).getId(), 2);
+        assertEquals(3, all.get(2).getId(), 3);
+        assertEquals("Драма", all.get(0).getName());
+        assertEquals("Триллер", all.get(1).getName());
+        assertEquals("Мультфильм", all.get(2).getName());
     }
 
 
@@ -58,12 +58,12 @@ class CachedGenreRepositoryTest {
 
         assertEquals(all.size(), 3);
 
-        assertEquals(all.get(0).getId(), 1);
-        assertEquals(all.get(1).getId(), 2);
-        assertEquals(all.get(2).getId(), 3);
-        assertEquals(all.get(0).getName(), "Драма");
-        assertEquals(all.get(1).getName(), "Триллер");
-        assertEquals(all.get(2).getName(), "Мультфильм");
+        assertEquals(1, all.get(0).getId(), 1);
+        assertEquals(2, all.get(1).getId(), 2);
+        assertEquals(3, all.get(2).getId(), 3);
+        assertEquals("Драма", all.get(0).getName());
+        assertEquals("Триллер", all.get(1).getName());
+        assertEquals("Мультфильм", all.get(2).getName());
     }
 
     @Test

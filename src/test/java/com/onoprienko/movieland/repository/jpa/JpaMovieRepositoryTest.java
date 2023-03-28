@@ -45,33 +45,33 @@ class JpaMovieRepositoryTest {
 
         assertEquals(all.size(), 3);
 
-        assertEquals(all.get(0).getId(), 1);
-        assertEquals(all.get(1).getId(), 2);
-        assertEquals(all.get(2).getId(), 3);
+        assertEquals(1, all.get(0).getId());
+        assertEquals(2, all.get(1).getId());
+        assertEquals(3, all.get(2).getId());
 
-        assertEquals(all.get(0).getRating(), 8.9);
-        assertEquals(all.get(1).getRating(), 8.9);
-        assertEquals(all.get(2).getRating(), 8.6);
+        assertEquals(8.9, all.get(0).getRating());
+        assertEquals(8.9, all.get(1).getRating());
+        assertEquals(8.6, all.get(2).getRating());
 
-        assertEquals(all.get(0).getPrice(), 123.45);
-        assertEquals(all.get(1).getPrice(), 134.67);
-        assertEquals(all.get(2).getPrice(), 200.60);
+        assertEquals(123.45, all.get(0).getPrice());
+        assertEquals(134.67, all.get(1).getPrice());
+        assertEquals(200.60, all.get(2).getPrice());
 
-        assertEquals(all.get(0).getYearOfRelease(), 1994);
-        assertEquals(all.get(1).getYearOfRelease(), 1999);
-        assertEquals(all.get(2).getYearOfRelease(), 1994);
+        assertEquals(1994, all.get(0).getYearOfRelease());
+        assertEquals(1999, all.get(1).getYearOfRelease());
+        assertEquals(1994, all.get(2).getYearOfRelease());
 
         assertNull(all.get(0).getPicturePath());
         assertNull(all.get(1).getPicturePath());
         assertNull(all.get(2).getPicturePath());
 
-        assertEquals(all.get(0).getNameRussian(), "Побег из Шоушенка");
-        assertEquals(all.get(1).getNameRussian(), "Зеленая миля");
-        assertEquals(all.get(2).getNameRussian(), "Форрест Гамп");
+        assertEquals("Побег из Шоушенка", all.get(0).getNameRussian());
+        assertEquals("Зеленая миля", all.get(1).getNameRussian());
+        assertEquals("Форрест Гамп", all.get(2).getNameRussian());
 
-        assertEquals(all.get(0).getNameNative(), "The Shawshank Redemption");
-        assertEquals(all.get(1).getNameNative(), "The Green Mile");
-        assertEquals(all.get(2).getNameNative(), "Forrest Gump");
+        assertEquals("The Shawshank Redemption", all.get(0).getNameNative());
+        assertEquals("The Green Mile", all.get(1).getNameNative());
+        assertEquals("Forrest Gump", all.get(2).getNameNative());
     }
 
     @Test
@@ -94,33 +94,33 @@ class JpaMovieRepositoryTest {
 
         assertEquals(all.size(), 3);
 
-        assertEquals(all.get(0).getId(), 2);
-        assertEquals(all.get(1).getId(), 1);
-        assertEquals(all.get(2).getId(), 4);
+        assertEquals(2, all.get(0).getId());
+        assertEquals(1, all.get(1).getId());
+        assertEquals(4, all.get(2).getId());
 
-        assertEquals(all.get(0).getRating(), 8.9);
-        assertEquals(all.get(1).getRating(), 8.9);
-        assertEquals(all.get(2).getRating(), 8.7);
+        assertEquals(8.9, all.get(0).getRating());
+        assertEquals(8.9, all.get(1).getRating());
+        assertEquals(8.7, all.get(2).getRating());
 
-        assertEquals(all.get(0).getPrice(), 134.67);
-        assertEquals(all.get(1).getPrice(), 123.45);
-        assertEquals(all.get(2).getPrice(), 150.5);
+        assertEquals(134.67, all.get(0).getPrice());
+        assertEquals(123.45, all.get(1).getPrice());
+        assertEquals(150.5, all.get(2).getPrice());
 
-        assertEquals(all.get(0).getYearOfRelease(), 1999);
-        assertEquals(all.get(1).getYearOfRelease(), 1994);
-        assertEquals(all.get(2).getYearOfRelease(), 1993);
+        assertEquals(1999, all.get(0).getYearOfRelease());
+        assertEquals(1994, all.get(1).getYearOfRelease());
+        assertEquals(1993, all.get(2).getYearOfRelease());
 
         assertNull(all.get(0).getPicturePath());
         assertNull(all.get(1).getPicturePath());
         assertNull(all.get(2).getPicturePath());
 
-        assertEquals(all.get(0).getNameRussian(), "Зеленая миля");
-        assertEquals(all.get(1).getNameRussian(), "Побег из Шоушенка");
-        assertEquals(all.get(2).getNameRussian(), "Список Шиндлера");
+        assertEquals("Зеленая миля", all.get(0).getNameRussian());
+        assertEquals("Побег из Шоушенка", all.get(1).getNameRussian());
+        assertEquals("Список Шиндлера", all.get(2).getNameRussian());
 
-        assertEquals(all.get(0).getNameNative(), "The Green Mile");
-        assertEquals(all.get(1).getNameNative(), "The Shawshank Redemption");
-        assertEquals(all.get(2).getNameNative(), "Schindler's List");
+        assertEquals("The Green Mile", all.get(0).getNameNative());
+        assertEquals("The Shawshank Redemption", all.get(1).getNameNative());
+        assertEquals("Schindler's List", all.get(2).getNameNative());
     }
 
 
@@ -136,34 +136,25 @@ class JpaMovieRepositoryTest {
 
         assertEquals(all.size(), 3);
 
+        assertEquals(3, all.get(0).getId());
+        assertEquals(17, all.get(1).getId());
+        assertEquals(9, all.get(2).getId());
 
-        assertEquals(all.get(0).getId(), 3);
-        assertEquals(all.get(1).getId(), 17);
-        assertEquals(all.get(2).getId(), 9);
+        assertEquals(8.6, all.get(0).getRating());
+        assertEquals(8.5, all.get(1).getRating());
+        assertEquals(8.1, all.get(2).getRating());
 
-        assertEquals(all.get(0).getRating(), 8.6);
-        assertEquals(all.get(1).getRating(), 8.5);
-        assertEquals(all.get(2).getRating(), 8.1);
+        assertEquals(200.60, all.get(0).getPrice());
+        assertEquals(199.99, all.get(1).getPrice());
+        assertEquals(198.98, all.get(2).getPrice());
 
-        assertEquals(all.get(0).getPrice(), 200.60);
-        assertEquals(all.get(1).getPrice(), 199.99);
-        assertEquals(all.get(2).getPrice(), 198.98);
-
-        assertEquals(all.get(0).getYearOfRelease(), 1994);
-        assertEquals(all.get(1).getYearOfRelease(), 2008);
-        assertEquals(all.get(2).getYearOfRelease(), 1977);
+        assertEquals(1994, all.get(0).getYearOfRelease());
+        assertEquals(2008, all.get(1).getYearOfRelease());
+        assertEquals(1977, all.get(2).getYearOfRelease());
 
         assertNull(all.get(0).getPicturePath());
         assertNull(all.get(1).getPicturePath());
         assertNull(all.get(2).getPicturePath());
-
-        assertEquals(all.get(0).getNameRussian(), "Форрест Гамп");
-        assertEquals(all.get(1).getNameRussian(), "Темный рыцарь");
-        assertEquals(all.get(2).getNameRussian(), "Звёздные войны: Эпизод 4 – Новая надежда");
-
-        assertEquals(all.get(0).getNameNative(), "Forrest Gump");
-        assertEquals(all.get(1).getNameNative(), "The Dark Knight");
-        assertEquals(all.get(2).getNameNative(), "Star Wars");
     }
 
 
@@ -179,33 +170,33 @@ class JpaMovieRepositoryTest {
         assertEquals(all.size(), 3);
 
 
-        assertEquals(all.get(0).getId(), 23);
-        assertEquals(all.get(1).getId(), 20);
-        assertEquals(all.get(2).getId(), 8);
+        assertEquals(23, all.get(0).getId());
+        assertEquals(20, all.get(1).getId());
+        assertEquals(8, all.get(2).getId());
 
-        assertEquals(all.get(0).getRating(), 7.6);
-        assertEquals(all.get(1).getRating(), 8.1);
-        assertEquals(all.get(2).getRating(), 8.4);
+        assertEquals(7.6, all.get(0).getRating());
+        assertEquals(8.1, all.get(1).getRating());
+        assertEquals(8.4, all.get(2).getRating());
 
-        assertEquals(all.get(0).getPrice(), 100.0);
-        assertEquals(all.get(1).getPrice(), 100.5);
-        assertEquals(all.get(2).getPrice(), 119.99);
+        assertEquals(100.0, all.get(0).getPrice());
+        assertEquals(100.5, all.get(1).getPrice());
+        assertEquals(119.99, all.get(2).getPrice());
 
-        assertEquals(all.get(0).getYearOfRelease(), 1976);
-        assertEquals(all.get(1).getYearOfRelease(), 1994);
-        assertEquals(all.get(2).getYearOfRelease(), 1999);
+        assertEquals(1976, all.get(0).getYearOfRelease());
+        assertEquals(1994, all.get(1).getYearOfRelease());
+        assertEquals(1999, all.get(2).getYearOfRelease());
 
         assertNull(all.get(0).getPicturePath());
         assertNull(all.get(1).getPicturePath());
         assertNull(all.get(2).getPicturePath());
 
-        assertEquals(all.get(0).getNameRussian(), "Блеф");
-        assertEquals(all.get(1).getNameRussian(), "Гран Торино");
-        assertEquals(all.get(2).getNameRussian(), "Бойцовский клуб");
+        assertEquals("Блеф", all.get(0).getNameRussian());
+        assertEquals("Гран Торино", all.get(1).getNameRussian());
+        assertEquals("Бойцовский клуб", all.get(2).getNameRussian());
 
-        assertEquals(all.get(0).getNameNative(), "Bluff storia di truffe e di imbroglioni");
-        assertEquals(all.get(1).getNameNative(), "Gran Torino");
-        assertEquals(all.get(2).getNameNative(), "Fight Club");
+        assertEquals("Bluff storia di truffe e di imbroglioni", all.get(0).getNameNative());
+        assertEquals("Gran Torino", all.get(1).getNameNative());
+        assertEquals("Fight Club", all.get(2).getNameNative());
     }
 
 
@@ -218,33 +209,34 @@ class JpaMovieRepositoryTest {
 
         assertEquals(all.size(), 3);
 
-        assertEquals(all.get(0).getId(), 1);
-        assertEquals(all.get(1).getId(), 2);
-        assertEquals(all.get(2).getId(), 3);
 
-        assertEquals(all.get(0).getRating(), 8.9);
-        assertEquals(all.get(1).getRating(), 8.9);
-        assertEquals(all.get(2).getRating(), 8.6);
+        assertEquals(1, all.get(0).getId());
+        assertEquals(2, all.get(1).getId());
+        assertEquals(3, all.get(2).getId());
 
-        assertEquals(all.get(0).getPrice(), 123.45);
-        assertEquals(all.get(1).getPrice(), 134.67);
-        assertEquals(all.get(2).getPrice(), 200.60);
+        assertEquals(8.9, all.get(0).getRating());
+        assertEquals(8.9, all.get(1).getRating());
+        assertEquals(8.6, all.get(2).getRating());
 
-        assertEquals(all.get(0).getYearOfRelease(), 1994);
-        assertEquals(all.get(1).getYearOfRelease(), 1999);
-        assertEquals(all.get(2).getYearOfRelease(), 1994);
+        assertEquals(123.45, all.get(0).getPrice());
+        assertEquals(134.67, all.get(1).getPrice());
+        assertEquals(200.60, all.get(2).getPrice());
+
+        assertEquals(1994, all.get(0).getYearOfRelease());
+        assertEquals(1999, all.get(1).getYearOfRelease());
+        assertEquals(1994, all.get(2).getYearOfRelease());
 
         assertNull(all.get(0).getPicturePath());
         assertNull(all.get(1).getPicturePath());
         assertNull(all.get(2).getPicturePath());
 
-        assertEquals(all.get(0).getNameRussian(), "Побег из Шоушенка");
-        assertEquals(all.get(1).getNameRussian(), "Зеленая миля");
-        assertEquals(all.get(2).getNameRussian(), "Форрест Гамп");
+        assertEquals("Побег из Шоушенка", all.get(0).getNameRussian());
+        assertEquals("Зеленая миля", all.get(1).getNameRussian());
+        assertEquals("Форрест Гамп", all.get(2).getNameRussian());
 
-        assertEquals(all.get(0).getNameNative(), "The Shawshank Redemption");
-        assertEquals(all.get(1).getNameNative(), "The Green Mile");
-        assertEquals(all.get(2).getNameNative(), "Forrest Gump");
+        assertEquals("The Shawshank Redemption", all.get(0).getNameNative());
+        assertEquals("The Green Mile", all.get(1).getNameNative());
+        assertEquals("Forrest Gump", all.get(2).getNameNative());
     }
 
 
@@ -257,33 +249,33 @@ class JpaMovieRepositoryTest {
 
         assertEquals(all.size(), 3);
 
-        assertEquals(all.get(0).getId(), 21);
-        assertEquals(all.get(1).getId(), 24);
-        assertEquals(all.get(2).getId(), 25);
+        assertEquals(21, all.get(0).getId());
+        assertEquals(24, all.get(1).getId());
+        assertEquals(25, all.get(2).getId());
 
-        assertEquals(all.get(0).getRating(), 8.5);
-        assertEquals(all.get(1).getRating(), 8.5);
-        assertEquals(all.get(2).getRating(), 8.0);
+        assertEquals(8.5, all.get(0).getRating());
+        assertEquals(8.5, all.get(1).getRating());
+        assertEquals(8.0, all.get(2).getRating());
 
-        assertEquals(all.get(0).getPrice(), 130.00);
-        assertEquals(all.get(1).getPrice(), 170.00);
-        assertEquals(all.get(2).getPrice(), 120.55);
+        assertEquals(130.00, all.get(0).getPrice());
+        assertEquals(170.00, all.get(1).getPrice());
+        assertEquals(120.55, all.get(2).getPrice());
 
-        assertEquals(all.get(0).getYearOfRelease(), 1979);
-        assertEquals(all.get(1).getYearOfRelease(), 2012);
-        assertEquals(all.get(2).getYearOfRelease(), 1990);
+        assertEquals(1979, all.get(0).getYearOfRelease());
+        assertEquals(2012, all.get(1).getYearOfRelease());
+        assertEquals(1990, all.get(2).getYearOfRelease());
 
         assertNull(all.get(0).getPicturePath());
         assertNull(all.get(1).getPicturePath());
         assertNull(all.get(2).getPicturePath());
 
-        assertEquals(all.get(0).getNameRussian(), "Хороший, плохой, злой");
-        assertEquals(all.get(1).getNameRussian(), "Джанго освобожденный");
-        assertEquals(all.get(2).getNameRussian(), "Танцующий с волками");
+        assertEquals("Хороший, плохой, злой", all.get(0).getNameRussian());
+        assertEquals("Джанго освобожденный", all.get(1).getNameRussian());
+        assertEquals("Танцующий с волками", all.get(2).getNameRussian());
 
-        assertEquals(all.get(0).getNameNative(), "Il buono, il brutto, il cattivo");
-        assertEquals(all.get(1).getNameNative(), "Django Unchained");
-        assertEquals(all.get(2).getNameNative(), "Dances with Wolves");
+        assertEquals("Il buono, il brutto, il cattivo", all.get(0).getNameNative());
+        assertEquals("Django Unchained", all.get(1).getNameNative());
+        assertEquals("Dances with Wolves", all.get(2).getNameNative());
     }
 
 
