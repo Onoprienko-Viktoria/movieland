@@ -1,64 +1,71 @@
 package com.onoprienko.movieland.service.impl;
 
-import com.onoprienko.movieland.entity.Movie;
-import com.onoprienko.movieland.repository.cache.MovieCache;
-import com.onoprienko.movieland.repository.dao.MovieDao;
+import com.onoprienko.movieland.common.MoviesRequest;
+import com.onoprienko.movieland.common.SortDirectionEnum;
+import com.onoprienko.movieland.common.SortTypeEnum;
+import com.onoprienko.movieland.dto.MovieDto;
+import com.onoprienko.movieland.mapper.MovieMapper;
+import com.onoprienko.movieland.repository.jpa.JpaMovieRepository;
 import com.onoprienko.movieland.service.MovieService;
-import com.onoprienko.movieland.service.entity.PageRequest;
-import com.onoprienko.movieland.service.entity.SortEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import static com.onoprienko.movieland.service.utils.RandomGenerationUtils.getRandomIndexes;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class DefaultMovieService implements MovieService {
-    @Value("${page.capacity.default}")
-    private int defaultPageCapacity;
-    @Value("${page.capacity.random}")
-    private int randomPageCapacity;
-    private final MovieDao movieDao;
-    private final MovieCache movieCache;
+    private final JpaMovieRepository jpaMovieRepository;
+    private final MovieMapper movieMapper;
 
+    private int defaultPageSize;
 
     @Override
-    public List<Movie> findAll(int page, SortEnum ratingSort, SortEnum priceSort) {
-        PageRequest pageRequest = PageRequest.builder().page(page).capacity(defaultPageCapacity).build();
-
-        if (ratingSort.equals(SortEnum.DESC)) {
-            return movieDao.findAllByRating(pageRequest);
-        }
-
-        if (!priceSort.equals(SortEnum.NONE)) {
-            return movieDao.findAllByPrice(pageRequest, priceSort);
-        }
-        return movieDao.findAll(pageRequest);
+    public List<MovieDto> findAll(MoviesRequest request) {
+        Pageable pageable = getPageableForMovie(request);
+        return movieMapper.mapToMovieDtoList(jpaMovieRepository.findAll(pageable).getContent());
     }
 
     @Override
-    public List<Movie> findAllByGenre(int genreId, int page) {
-        PageRequest request = PageRequest.builder().page(page).capacity(defaultPageCapacity).build();
-        return movieDao.findAllByGenre(genreId, request);
+    public List<MovieDto> findByGenre(MoviesRequest request) {
+        Pageable pageable = getPageableForMovie(request);
+        return movieMapper.mapToMovieDtoList(jpaMovieRepository.findByGenreId(request.getGenreId(), pageable));
     }
 
     @Override
-    public List<Movie> findRandom() {
-        List<Movie> movies = new ArrayList<>();
-        HashMap<Integer, Movie> cache = movieCache.getMovieCache();
-        List<Integer> randomIndexes = getRandomIndexes(cache.size(), randomPageCapacity);
-        for (Integer randomIndex : randomIndexes) {
-            movies.add(cache.get(randomIndex));
-        }
-        return movies;
+    public List<MovieDto> findRandom() {
+        return movieMapper.mapToMovieDtoList(jpaMovieRepository.findRandomMovies());
     }
 
-    void setRandomPageCapacity(int randomPageCapacity) {
-        this.randomPageCapacity = randomPageCapacity;
+
+    private Pageable getPageableForMovie(MoviesRequest request) {
+        if (request.getPriceDirection() != null || request.getRatingDirection() != null) {
+            return PageRequest.of(request.getPage(),
+                    defaultPageSize,
+                    getSortForMovie(request));
+        }
+        return PageRequest.of(request.getPage(), defaultPageSize);
+    }
+
+    private Sort getSortForMovie(MoviesRequest request) {
+        Sort sort = null;
+        if (Objects.equals(request.getRatingDirection(), SortDirectionEnum.ASC)) {
+            sort = Sort.by(SortTypeEnum.RATING.name().toLowerCase()).ascending();
+        } else if (Objects.equals(request.getPriceDirection(), SortDirectionEnum.ASC)) {
+            sort = Sort.by(SortTypeEnum.PRICE.name().toLowerCase()).ascending();
+        } else if (Objects.equals(request.getPriceDirection(), SortDirectionEnum.DESC)) {
+            sort = Sort.by(SortTypeEnum.PRICE.name().toLowerCase()).descending();
+        }
+        return sort;
+    }
+
+    @Value("${movie.page.size}")
+    public void setDefaultPageSize(int defaultPageSize) {
+        this.defaultPageSize = defaultPageSize;
     }
 }

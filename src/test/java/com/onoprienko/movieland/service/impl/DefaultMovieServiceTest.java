@@ -1,13 +1,16 @@
 package com.onoprienko.movieland.service.impl;
 
+import com.onoprienko.movieland.common.MoviesRequest;
+import com.onoprienko.movieland.common.SortDirectionEnum;
+import com.onoprienko.movieland.dto.MovieDto;
 import com.onoprienko.movieland.entity.Movie;
-import com.onoprienko.movieland.repository.cache.MovieCache;
-import com.onoprienko.movieland.repository.dao.MovieDao;
-import com.onoprienko.movieland.service.MovieService;
-import com.onoprienko.movieland.service.entity.PageRequest;
-import com.onoprienko.movieland.service.entity.SortEnum;
+import com.onoprienko.movieland.mapper.MovieMapper;
+import com.onoprienko.movieland.repository.jpa.JpaMovieRepository;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,25 +39,25 @@ class DefaultMovieServiceTest {
     List<Movie> movies = List.of(testMovieOne, testMovieTwo);
 
 
-    MovieDao movieDao = Mockito.mock(MovieDao.class);
-    MovieService movieService = new DefaultMovieService(movieDao, new MovieCache(movieDao));
+    JpaMovieRepository repository = Mockito.mock(JpaMovieRepository.class);
+    DefaultMovieService movieService = new DefaultMovieService(repository, Mappers.getMapper(MovieMapper.class));
 
 
     @Test
     void findAllReturnList() {
         Mockito.when(
-                movieDao.findAll(
-                        Mockito.any(PageRequest.class)
-                )
-        ).thenReturn(movies);
+                repository.findAll(Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(movies));
+        MoviesRequest moviesRequest = MoviesRequest.builder()
+                .page(1).build();
+        movieService.setDefaultPageSize(10);
 
-        List<Movie> all = movieService.findAll(1, SortEnum.NONE, SortEnum.NONE);
+        List<MovieDto> all = movieService.findAll(moviesRequest);
 
         assertNotNull(all);
         assertEquals(all.size(), 2);
 
-        Movie movieOne = all.get(0);
-        Movie movieTwo = all.get(1);
+        MovieDto movieOne = all.get(0);
+        MovieDto movieTwo = all.get(1);
 
 
         assertEquals(movieOne.getId(), 1);
@@ -73,26 +76,32 @@ class DefaultMovieServiceTest {
         assertEquals(movieTwo.getYearOfRelease(), 2000);
         assertEquals(movieTwo.getPicturePath(), "path");
 
-        Mockito.verify(movieDao, Mockito.times(1))
-                .findAll(Mockito.any(PageRequest.class));
+        Mockito.verify(repository, Mockito.times(1))
+                .findAll(Mockito.any(Pageable.class));
     }
 
 
     @Test
-    void findAllWithRatingDescReturnList() {
+    void findAllWithRatingAscReturnList() {
         Mockito.when(
-                movieDao.findAllByRating(
-                        Mockito.any(PageRequest.class)
+                repository.findAll(
+                        Mockito.any(Pageable.class)
                 )
-        ).thenReturn(List.of(testMovieTwo, testMovieOne));
+        ).thenReturn(new PageImpl<>(List.of(testMovieTwo, testMovieOne)));
+        MoviesRequest moviesRequest = MoviesRequest.builder()
+                .page(1)
+                .ratingDirection(SortDirectionEnum.ASC)
+                .build();
+        movieService.setDefaultPageSize(10);
 
-        List<Movie> all = movieService.findAll(1, SortEnum.DESC, SortEnum.NONE);
+
+        List<MovieDto> all = movieService.findAll(moviesRequest);
 
         assertNotNull(all);
         assertEquals(all.size(), 2);
 
-        Movie movieOne = all.get(1);
-        Movie movieTwo = all.get(0);
+        MovieDto movieOne = all.get(1);
+        MovieDto movieTwo = all.get(0);
 
 
         assertEquals(movieOne.getId(), 1);
@@ -111,64 +120,30 @@ class DefaultMovieServiceTest {
         assertEquals(movieTwo.getYearOfRelease(), 2000);
         assertEquals(movieTwo.getPicturePath(), "path");
 
-        Mockito.verify(movieDao, Mockito.times(1))
-                .findAllByRating(Mockito.any(PageRequest.class));
-    }
-
-
-    @Test
-    void findAllWithRatingAscNotSortList() {
-        Mockito.when(
-                movieDao.findAll(
-                        Mockito.any(PageRequest.class)
-                )
-        ).thenReturn(movies);
-
-        List<Movie> all = movieService.findAll(1, SortEnum.ASC, SortEnum.NONE);
-
-        assertNotNull(all);
-        assertEquals(all.size(), 2);
-
-        Movie movieOne = all.get(0);
-        Movie movieTwo = all.get(1);
-
-
-        assertEquals(movieOne.getId(), 1);
-        assertEquals(movieOne.getPrice(), 55.8);
-        assertEquals(movieOne.getRating(), 7.3);
-        assertEquals(movieOne.getNameNative(), "Test one");
-        assertEquals(movieOne.getNameRussian(), "Тест один");
-        assertEquals(movieOne.getYearOfRelease(), 1900);
-        assertEquals(movieOne.getPicturePath(), "path");
-
-        assertEquals(movieTwo.getId(), 2);
-        assertEquals(movieTwo.getPrice(), 111.1);
-        assertEquals(movieTwo.getRating(), 9.8);
-        assertEquals(movieTwo.getNameNative(), "Test two");
-        assertEquals(movieTwo.getNameRussian(), "Тест два");
-        assertEquals(movieTwo.getYearOfRelease(), 2000);
-        assertEquals(movieTwo.getPicturePath(), "path");
-
-        Mockito.verify(movieDao, Mockito.times(1))
-                .findAll(Mockito.any(PageRequest.class));
+        Mockito.verify(repository, Mockito.times(1))
+                .findAll(Mockito.any(Pageable.class));
     }
 
 
     @Test
     void findAllWithPriceAscReturnList() {
         Mockito.when(
-                movieDao.findAllByPrice(
-                        Mockito.any(PageRequest.class), Mockito.any(SortEnum.class)
+                repository.findAll(
+                        Mockito.any(Pageable.class)
                 )
-        ).thenReturn(movies);
-
-        List<Movie> all = movieService.findAll(1, SortEnum.NONE, SortEnum.ASC);
+        ).thenReturn(new PageImpl<>(movies));
+        MoviesRequest moviesRequest = MoviesRequest.builder()
+                .page(1)
+                .priceDirection(SortDirectionEnum.ASC)
+                .build();
+        movieService.setDefaultPageSize(10);
+        List<MovieDto> all = movieService.findAll(moviesRequest);
 
         assertNotNull(all);
         assertEquals(all.size(), 2);
 
-        Movie movieOne = all.get(0);
-        Movie movieTwo = all.get(1);
+        MovieDto movieOne = all.get(0);
+        MovieDto movieTwo = all.get(1);
 
 
         assertEquals(movieOne.getId(), 1);
@@ -187,25 +162,30 @@ class DefaultMovieServiceTest {
         assertEquals(movieTwo.getYearOfRelease(), 2000);
         assertEquals(movieTwo.getPicturePath(), "path");
 
-        Mockito.verify(movieDao, Mockito.times(1))
-                .findAllByPrice(Mockito.any(PageRequest.class), Mockito.any(SortEnum.class));
+        Mockito.verify(repository, Mockito.times(1))
+                .findAll(Mockito.any(Pageable.class));
     }
 
     @Test
     void findAllWithPriceDescReturnList() {
         Mockito.when(
-                movieDao.findAllByPrice(
-                        Mockito.any(PageRequest.class), Mockito.any(SortEnum.class)
+                repository.findAll(
+                        Mockito.any(Pageable.class)
                 )
-        ).thenReturn(List.of(testMovieTwo, testMovieOne));
+        ).thenReturn(new PageImpl<>(List.of(testMovieTwo, testMovieOne)));
+        MoviesRequest moviesRequest = MoviesRequest.builder()
+                .page(1)
+                .priceDirection(SortDirectionEnum.DESC)
+                .build();
+        movieService.setDefaultPageSize(10);
 
-        List<Movie> all = movieService.findAll(1, SortEnum.NONE, SortEnum.DESC);
+        List<MovieDto> all = movieService.findAll(moviesRequest);
 
         assertNotNull(all);
         assertEquals(all.size(), 2);
 
-        Movie movieOne = all.get(1);
-        Movie movieTwo = all.get(0);
+        MovieDto movieOne = all.get(1);
+        MovieDto movieTwo = all.get(0);
 
 
         assertEquals(movieOne.getId(), 1);
@@ -224,26 +204,32 @@ class DefaultMovieServiceTest {
         assertEquals(movieTwo.getYearOfRelease(), 2000);
         assertEquals(movieTwo.getPicturePath(), "path");
 
-        Mockito.verify(movieDao, Mockito.times(1))
-                .findAllByPrice(Mockito.any(PageRequest.class), Mockito.any(SortEnum.class));
+        Mockito.verify(repository, Mockito.times(1))
+                .findAll(Mockito.any(Pageable.class));
     }
 
 
     @Test
     void findAllWithPriceAndRatingSortWillReturnRatingSortList() {
         Mockito.when(
-                movieDao.findAllByRating(
-                        Mockito.any(PageRequest.class)
+                repository.findAll(
+                        Mockito.any(Pageable.class)
                 )
-        ).thenReturn(movies);
+        ).thenReturn(new PageImpl<>(movies));
+        MoviesRequest moviesRequest = MoviesRequest.builder()
+                .page(1)
+                .priceDirection(SortDirectionEnum.DESC)
+                .ratingDirection(SortDirectionEnum.ASC)
+                .build();
+        movieService.setDefaultPageSize(10);
 
-        List<Movie> all = movieService.findAll(1, SortEnum.DESC, SortEnum.DESC);
+        List<MovieDto> all = movieService.findAll(moviesRequest);
 
         assertNotNull(all);
         assertEquals(all.size(), 2);
 
-        Movie movieOne = all.get(0);
-        Movie movieTwo = all.get(1);
+        MovieDto movieOne = all.get(0);
+        MovieDto movieTwo = all.get(1);
 
 
         assertEquals(movieOne.getId(), 1);
@@ -262,56 +248,68 @@ class DefaultMovieServiceTest {
         assertEquals(movieTwo.getYearOfRelease(), 2000);
         assertEquals(movieTwo.getPicturePath(), "path");
 
-        Mockito.verify(movieDao, Mockito.times(1))
-                .findAllByRating(Mockito.any(PageRequest.class));
+        Mockito.verify(repository, Mockito.times(1))
+                .findAll(Mockito.any(Pageable.class));
     }
 
     @Test
     void findAllReturnEmptyList() {
         Mockito.when(
-                movieDao.findAll(
-                        Mockito.any(PageRequest.class)
+                repository.findAll(
+                        Mockito.any(Pageable.class)
                 )
-        ).thenReturn(new ArrayList<>());
-
-        List<Movie> all = movieService.findAll(1, SortEnum.NONE, SortEnum.NONE);
+        ).thenReturn(new PageImpl<>(new ArrayList<>()));
+        MoviesRequest moviesRequest = MoviesRequest.builder()
+                .page(1)
+                .build();
+        movieService.setDefaultPageSize(10);
+        List<MovieDto> all = movieService.findAll(moviesRequest);
 
         assertNotNull(all);
         assertEquals(all.size(), 0);
 
-        Mockito.verify(movieDao, Mockito.times(1))
-                .findAll(Mockito.any(PageRequest.class));
+        Mockito.verify(repository, Mockito.times(1))
+                .findAll(Mockito.any(Pageable.class));
     }
 
     @Test
     void findAllReturnException() {
         Mockito.when(
-                movieDao.findAll(
-                        Mockito.any(PageRequest.class)
+                repository.findAll(
+                        Mockito.any(Pageable.class)
                 )
         ).thenThrow(new RuntimeException());
+        MoviesRequest moviesRequest = MoviesRequest.builder()
+                .page(1)
+                .build();
+        movieService.setDefaultPageSize(10);
 
-        assertThrows(RuntimeException.class, () -> movieService.findAll(1, SortEnum.NONE, SortEnum.NONE));
+        assertThrows(RuntimeException.class, () -> movieService.findAll(moviesRequest));
 
-        Mockito.verify(movieDao, Mockito.times(1))
-                .findAll(Mockito.any(PageRequest.class));
+        Mockito.verify(repository, Mockito.times(1))
+                .findAll(Mockito.any(Pageable.class));
     }
 
     @Test
     void findAllByGenreReturnListOfMovies() {
         Mockito.when(
-                movieDao.findAllByGenre(Mockito.anyInt(),
-                        Mockito.any(PageRequest.class)
+                repository.findByGenreId(Mockito.anyLong(),
+                        Mockito.any(Pageable.class)
                 )
         ).thenReturn(movies);
+        MoviesRequest moviesRequest = MoviesRequest.builder()
+                .page(1)
+                .genreId(1)
+                .build();
+        movieService.setDefaultPageSize(10);
 
-        List<Movie> all = movieService.findAllByGenre(1, 1);
+        List<MovieDto> all = movieService.findByGenre(moviesRequest);
 
         assertNotNull(all);
         assertEquals(all.size(), 2);
 
-        Movie movieOne = all.get(0);
-        Movie movieTwo = all.get(1);
+        MovieDto movieOne = all.get(0);
+        MovieDto movieTwo = all.get(1);
 
 
         assertEquals(movieOne.getId(), 1);
@@ -330,59 +328,61 @@ class DefaultMovieServiceTest {
         assertEquals(movieTwo.getYearOfRelease(), 2000);
         assertEquals(movieTwo.getPicturePath(), "path");
 
-        Mockito.verify(movieDao, Mockito.times(1))
-                .findAllByGenre(Mockito.anyInt(), Mockito.any(PageRequest.class));
+        Mockito.verify(repository, Mockito.times(1))
+                .findByGenreId(Mockito.anyLong(), Mockito.any(Pageable.class));
     }
 
 
     @Test
     void findAllByGenreReturnVoidList() {
         Mockito.when(
-                movieDao.findAllByGenre(Mockito.anyInt(),
-                        Mockito.any(PageRequest.class)
+                repository.findByGenreId(Mockito.anyLong(),
+                        Mockito.any(Pageable.class)
                 )
         ).thenReturn(new ArrayList<>());
-
-        List<Movie> all = movieService.findAllByGenre(133, 1);
+        MoviesRequest moviesRequest = MoviesRequest.builder()
+                .page(133)
+                .genreId(1)
+                .build();
+        movieService.setDefaultPageSize(10);
+        List<MovieDto> all = movieService.findByGenre(moviesRequest);
 
         assertNotNull(all);
         assertEquals(all.size(), 0);
 
-        Mockito.verify(movieDao, Mockito.times(1))
-                .findAllByGenre(Mockito.anyInt(), Mockito.any(PageRequest.class));
+        Mockito.verify(repository, Mockito.times(1))
+                .findByGenreId(Mockito.anyLong(), Mockito.any(Pageable.class));
     }
 
     @Test
     void findAllByGenreReturnException() {
         Mockito.when(
-                movieDao.findAllByGenre(Mockito.anyInt(),
-                        Mockito.any(PageRequest.class)
+                repository.findByGenreId(Mockito.anyLong(),
+                        Mockito.any(Pageable.class)
                 )
         ).thenThrow(new RuntimeException());
+        MoviesRequest moviesRequest = MoviesRequest.builder()
+                .page(133)
+                .genreId(1)
+                .build();
+        movieService.setDefaultPageSize(10);
+        assertThrows(RuntimeException.class, () -> movieService.findByGenre(moviesRequest));
 
-        assertThrows(RuntimeException.class, () -> movieService.findAllByGenre(133, 1));
-
-        Mockito.verify(movieDao, Mockito.times(1))
-                .findAllByGenre(Mockito.anyInt(), Mockito.any(PageRequest.class));
+        Mockito.verify(repository, Mockito.times(1))
+                .findByGenreId(Mockito.anyLong(), Mockito.any(Pageable.class));
     }
 
 
     @Test
-    void findRandomFromCacheWithSameValuesReturnCorrectResult() {
-        MovieCache movieCache = new MovieCache(movieDao);
-        DefaultMovieService defaultMovieService = new DefaultMovieService(movieDao, movieCache);
-        defaultMovieService.setRandomPageCapacity(3);
+    void findRandomWithSameValuesReturnCorrectResult() {
         Mockito.when(
-                movieDao.findAll(
-                        Mockito.any(PageRequest.class)
-                )
+                repository.findRandomMovies()
         ).thenReturn(List.of(testMovieOne, testMovieOne, testMovieOne));
-        movieCache.updateMovieCache();
 
-        List<Movie> random = defaultMovieService.findRandom();
+        List<MovieDto> random = movieService.findRandom();
         assertNotNull(random);
         assertEquals(random.size(), 3);
-        Movie movieOne = random.get(0);
+        MovieDto movieOne = random.get(0);
 
         assertEquals(movieOne.getId(), 1);
         assertEquals(movieOne.getPrice(), 55.8);
@@ -392,7 +392,7 @@ class DefaultMovieServiceTest {
         assertEquals(movieOne.getYearOfRelease(), 1900);
         assertEquals(movieOne.getPicturePath(), "path");
 
-        Movie movieTwo = random.get(1);
+        MovieDto movieTwo = random.get(1);
 
         assertEquals(movieTwo.getId(), 1);
         assertEquals(movieTwo.getPrice(), 55.8);
@@ -401,55 +401,5 @@ class DefaultMovieServiceTest {
         assertEquals(movieTwo.getNameRussian(), "Тест один");
         assertEquals(movieTwo.getYearOfRelease(), 1900);
         assertEquals(movieTwo.getPicturePath(), "path");
-    }
-
-    @Test
-    void findRandomFromCacheReturnCorrectResult() {
-        MovieCache movieCache = new MovieCache(movieDao);
-        DefaultMovieService defaultMovieService = new DefaultMovieService(movieDao, movieCache);
-        defaultMovieService.setRandomPageCapacity(2);
-        Mockito.when(
-                movieDao.findAll(
-                        Mockito.any(PageRequest.class)
-                )
-        ).thenReturn(movies);
-        movieCache.updateMovieCache();
-
-        List<Movie> random = defaultMovieService.findRandom();
-        assertNotNull(random);
-        assertEquals(random.size(), 2);
-
-    }
-
-    @Test
-    void findRandomFromCacheReturnVoidListIfPageCapacityZero() {
-        MovieCache movieCache = new MovieCache(movieDao);
-        DefaultMovieService defaultMovieService = new DefaultMovieService(movieDao, movieCache);
-        defaultMovieService.setRandomPageCapacity(0);
-        Mockito.when(
-                movieDao.findAll(
-                        Mockito.any(PageRequest.class)
-                )
-        ).thenReturn(movies);
-        movieCache.updateMovieCache();
-
-        List<Movie> random = defaultMovieService.findRandom();
-        assertNotNull(random);
-        assertTrue(random.isEmpty());
-
-    }
-
-    @Test
-    void findRandomFromOneItemCacheReturnException() {
-        MovieCache movieCache = new MovieCache(movieDao);
-        DefaultMovieService defaultMovieService = new DefaultMovieService(movieDao, movieCache);
-        Mockito.when(
-                movieDao.findAll(
-                        Mockito.any(PageRequest.class)
-                )
-        ).thenReturn(List.of(testMovieOne));
-        movieCache.updateMovieCache();
-
-        assertThrows(IllegalArgumentException.class, defaultMovieService::findRandom);
     }
 }

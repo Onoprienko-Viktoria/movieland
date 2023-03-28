@@ -1,14 +1,14 @@
 package com.onoprienko.movieland.service;
 
-import com.onoprienko.movieland.entity.Movie;
-import com.onoprienko.movieland.service.entity.SortEnum;
+import com.onoprienko.movieland.common.MoviesRequest;
+import com.onoprienko.movieland.dto.MovieDto;
 
 import java.util.List;
 
 public interface MovieService {
-    List<Movie> findAll(int page, SortEnum ratingSort, SortEnum priceSort);
+    List<MovieDto> findAll(MoviesRequest request);
 
-    List<Movie> findAllByGenre(int genreId, int page);
+    List<MovieDto> findByGenre(MoviesRequest request);
 
-    List<Movie> findRandom();
+    List<MovieDto> findRandom();
 }

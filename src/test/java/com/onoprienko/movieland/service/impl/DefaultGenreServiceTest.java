@@ -1,7 +1,7 @@
 package com.onoprienko.movieland.service.impl;
 
 import com.onoprienko.movieland.entity.Genre;
-import com.onoprienko.movieland.repository.cache.GenreCache;
+import com.onoprienko.movieland.repository.cache.CachedGenreRepository;
 import com.onoprienko.movieland.service.GenreService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -20,9 +20,9 @@ class DefaultGenreServiceTest {
 
     @Test
     void findAllReturnListOfGenresFromCache() {
-        GenreCache genreCache = Mockito.mock(GenreCache.class);
-        Mockito.when(genreCache.getGenreCache()).thenReturn(genres);
-        GenreService genreService = new DefaultGenreService(genreCache);
+        CachedGenreRepository repository = Mockito.mock(CachedGenreRepository.class);
+        Mockito.when(repository.findAll()).thenReturn(genres);
+        GenreService genreService = new DefaultGenreService(repository);
 
         List<Genre> all = genreService.findAll();
 
@@ -40,9 +40,9 @@ class DefaultGenreServiceTest {
 
     @Test
     void findAllReturnVoidListFromCache() {
-        GenreCache genreCache = Mockito.mock(GenreCache.class);
-        Mockito.when(genreCache.getGenreCache()).thenReturn(new ArrayList<>());
-        GenreService genreService = new DefaultGenreService(genreCache);
+        CachedGenreRepository repository = Mockito.mock(CachedGenreRepository.class);
+        Mockito.when(repository.findAll()).thenReturn(new ArrayList<>());
+        GenreService genreService = new DefaultGenreService(repository);
 
         List<Genre> all = genreService.findAll();
 
@@ -52,9 +52,9 @@ class DefaultGenreServiceTest {
 
     @Test
     void findAllReturnNullFromCache() {
-        GenreCache genreCache = Mockito.mock(GenreCache.class);
-        Mockito.when(genreCache.getGenreCache()).thenReturn(null);
-        GenreService genreService = new DefaultGenreService(genreCache);
+        CachedGenreRepository repository = Mockito.mock(CachedGenreRepository.class);
+        Mockito.when(repository.findAll()).thenReturn(null);
+        GenreService genreService = new DefaultGenreService(repository);
 
         List<Genre> all = genreService.findAll();
 

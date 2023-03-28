@@ -1,9 +1,10 @@
 package com.onoprienko.movieland.web.controller;
 
-import com.onoprienko.movieland.entity.Movie;
+import com.onoprienko.movieland.common.MoviesRequest;
+import com.onoprienko.movieland.dto.MovieDto;
 import com.onoprienko.movieland.service.MovieService;
-import com.onoprienko.movieland.service.entity.SortEnum;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,7 +33,7 @@ class MovieControllerTest {
 
     private final String baseUrl = "/api/v1/movie/";
 
-    Movie testMovieOne = Movie.builder()
+    MovieDto testMovieOne = MovieDto.builder()
             .id(1L)
             .price(55.8)
             .rating(7.3)
@@ -41,7 +42,7 @@ class MovieControllerTest {
             .yearOfRelease(1900)
             .picturePath("path")
             .build();
-    Movie testMovieTwo = Movie.builder().id(2L)
+    MovieDto testMovieTwo = MovieDto.builder().id(2L)
             .price(111.1)
             .rating(9.8)
             .nameRussian("Тест два")
@@ -49,7 +50,7 @@ class MovieControllerTest {
             .yearOfRelease(2000)
             .picturePath("path")
             .build();
-    Movie tesMovieThree = Movie.builder().id(3L)
+    MovieDto tesMovieThree = MovieDto.builder().id(3L)
             .price(355.0)
             .rating(5.5)
             .nameRussian("Тест три")
@@ -58,12 +59,12 @@ class MovieControllerTest {
             .picturePath("path")
             .build();
 
-    List<Movie> movies = List.of(testMovieOne, testMovieTwo, tesMovieThree);
+    List<MovieDto> movies = List.of(testMovieOne, testMovieTwo, tesMovieThree);
 
     @Test
     void findAllMoviesByPage() throws Exception {
-        given(movieService.findAll(1, SortEnum.NONE, SortEnum.NONE)).willReturn(movies);
-        mvc.perform(get(baseUrl + "?page=1").contentType(MediaType.APPLICATION_JSON))
+        given(movieService.findAll(Mockito.any(MoviesRequest.class))).willReturn(movies);
+        mvc.perform(get(baseUrl + "?page=0").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[0].id", is(1)))
@@ -88,14 +89,14 @@ class MovieControllerTest {
                 .andExpect(jsonPath("$[1].picturePath", is("path")))
                 .andExpect(jsonPath("$[2].picturePath", is("path")));
 
-        verify(movieService, times(1)).findAll(1, SortEnum.NONE, SortEnum.NONE);
+        verify(movieService, times(1)).findAll(Mockito.any(MoviesRequest.class));
     }
 
     @Test
     void findAllMoviesByPageAndRatingDesc() throws Exception {
-        List<Movie> descRatingMovies = List.of(testMovieTwo, testMovieOne, tesMovieThree);
-        given(movieService.findAll(1, SortEnum.DESC, SortEnum.NONE)).willReturn(descRatingMovies);
-        mvc.perform(get(baseUrl + "?page=1&rating=desc").contentType(MediaType.APPLICATION_JSON))
+        List<MovieDto> descRatingMovies = List.of(testMovieTwo, testMovieOne, tesMovieThree);
+        given(movieService.findAll(Mockito.any(MoviesRequest.class))).willReturn(descRatingMovies);
+        mvc.perform(get(baseUrl + "?page=1&rating=DESC").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[0].id", is(2)))
@@ -120,13 +121,44 @@ class MovieControllerTest {
                 .andExpect(jsonPath("$[1].picturePath", is("path")))
                 .andExpect(jsonPath("$[2].picturePath", is("path")));
 
-        verify(movieService, times(1)).findAll(1, SortEnum.DESC, SortEnum.NONE);
+        verify(movieService, times(1)).findAll(Mockito.any(MoviesRequest.class));
+    }
+
+
+    @Test
+    void findAllMoviesReturnBadRequestIfRequestRatingParamAreNotCorrect() throws Exception {
+        List<MovieDto> descRatingMovies = List.of(testMovieTwo, testMovieOne, tesMovieThree);
+        given(movieService.findAll(Mockito.any(MoviesRequest.class))).willReturn(descRatingMovies);
+        mvc.perform(get(baseUrl + "?page=1&rating=asdf").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        verify(movieService, times(0)).findAll(Mockito.any(MoviesRequest.class));
+    }
+
+    @Test
+    void findAllMoviesReturnBadRequestIfRequestPriceParamAreNotCorrect() throws Exception {
+        List<MovieDto> descRatingMovies = List.of(testMovieTwo, testMovieOne, tesMovieThree);
+        given(movieService.findAll(Mockito.any(MoviesRequest.class))).willReturn(descRatingMovies);
+        mvc.perform(get(baseUrl + "?page=1&price=1231").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        verify(movieService, times(0)).findAll(Mockito.any(MoviesRequest.class));
+    }
+
+    @Test
+    void findAllMoviesReturnBadRequestIfThereAreNoPageInRequest() throws Exception {
+        List<MovieDto> descRatingMovies = List.of(testMovieTwo, testMovieOne, tesMovieThree);
+        given(movieService.findAll(Mockito.any(MoviesRequest.class))).willReturn(descRatingMovies);
+        mvc.perform(get(baseUrl + "?rating=asc").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        verify(movieService, times(0)).findAll(Mockito.any(MoviesRequest.class));
     }
 
     @Test
     void findAllMoviesByPageAndPriceAsc() throws Exception {
-        given(movieService.findAll(1, SortEnum.NONE, SortEnum.ASC)).willReturn(movies);
-        mvc.perform(get(baseUrl + "?page=1&price=asc").contentType(MediaType.APPLICATION_JSON))
+        given(movieService.findAll(Mockito.any(MoviesRequest.class))).willReturn(movies);
+        mvc.perform(get(baseUrl + "?page=1&price=ASC").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[0].id", is(1)))
@@ -151,14 +183,14 @@ class MovieControllerTest {
                 .andExpect(jsonPath("$[1].picturePath", is("path")))
                 .andExpect(jsonPath("$[2].picturePath", is("path")));
 
-        verify(movieService, times(1)).findAll(1, SortEnum.NONE, SortEnum.ASC);
+        verify(movieService, times(1)).findAll(Mockito.any(MoviesRequest.class));
     }
 
     @Test
     void findAllMoviesByPageAndPriceDesc() throws Exception {
-        List<Movie> descPriceMovies = List.of(tesMovieThree, testMovieTwo, testMovieOne);
-        given(movieService.findAll(1, SortEnum.NONE, SortEnum.DESC)).willReturn(descPriceMovies);
-        mvc.perform(get(baseUrl + "?page=1&price=desc").contentType(MediaType.APPLICATION_JSON))
+        List<MovieDto> descPriceMovies = List.of(tesMovieThree, testMovieTwo, testMovieOne);
+        given(movieService.findAll(Mockito.any(MoviesRequest.class))).willReturn(descPriceMovies);
+        mvc.perform(get(baseUrl + "?page=1&price=DESC").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[2].id", is(1)))
@@ -183,23 +215,13 @@ class MovieControllerTest {
                 .andExpect(jsonPath("$[1].picturePath", is("path")))
                 .andExpect(jsonPath("$[0].picturePath", is("path")));
 
-        verify(movieService, times(1)).findAll(1, SortEnum.NONE, SortEnum.DESC);
+        verify(movieService, times(1)).findAll(Mockito.any(MoviesRequest.class));
     }
-
-    @Test
-    void findAllMoviesReturnBadRequestOnException() throws Exception {
-        given(movieService.findAll(2, SortEnum.NONE, SortEnum.NONE)).willThrow(new RuntimeException("Exception"));
-        mvc.perform(get(baseUrl + "?page=2").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-
-        verify(movieService, times(1)).findAll(2, SortEnum.NONE, SortEnum.NONE);
-    }
-
 
     @Test
     void findByGenreReturnListOfMovies() throws Exception {
-        List<Movie> moviesByGenre = List.of(testMovieOne, testMovieTwo);
-        given(movieService.findAllByGenre(1, 1)).willReturn(moviesByGenre);
+        List<MovieDto> moviesByGenre = List.of(testMovieOne, testMovieTwo);
+        given(movieService.findByGenre(Mockito.any(MoviesRequest.class))).willReturn(moviesByGenre);
         mvc.perform(get(baseUrl + "/genre/1?page=1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -218,33 +240,129 @@ class MovieControllerTest {
                 .andExpect(jsonPath("$[0].picturePath", is("path")))
                 .andExpect(jsonPath("$[1].picturePath", is("path")));
 
-        verify(movieService, times(1)).findAllByGenre(1, 1);
+        verify(movieService, times(1)).findByGenre(Mockito.any(MoviesRequest.class));
     }
 
+
+    @Test
+    void findByGenreAndByPageAndRatingDesc() throws Exception {
+        List<MovieDto> descRatingMovies = List.of(testMovieTwo, testMovieOne, tesMovieThree);
+        given(movieService.findByGenre(Mockito.any(MoviesRequest.class))).willReturn(descRatingMovies);
+        mvc.perform(get(baseUrl + "/genre/1?page=1&rating=DESC").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].id", is(2)))
+                .andExpect(jsonPath("$[1].id", is(1)))
+                .andExpect(jsonPath("$[2].id", is(3)))
+                .andExpect(jsonPath("$[0].price", is(111.1)))
+                .andExpect(jsonPath("$[1].price", is(55.8)))
+                .andExpect(jsonPath("$[2].price", is(355.0)))
+                .andExpect(jsonPath("$[0].rating", is(9.8)))
+                .andExpect(jsonPath("$[1].rating", is(7.3)))
+                .andExpect(jsonPath("$[2].rating", is(5.5)))
+                .andExpect(jsonPath("$[0].nameRussian", is("Тест два")))
+                .andExpect(jsonPath("$[1].nameRussian", is("Тест один")))
+                .andExpect(jsonPath("$[2].nameRussian", is("Тест три")))
+                .andExpect(jsonPath("$[0].nameNative", is("Test two")))
+                .andExpect(jsonPath("$[1].nameNative", is("Test one")))
+                .andExpect(jsonPath("$[2].nameNative", is("Test three")))
+                .andExpect(jsonPath("$[0].yearOfRelease", is(2000)))
+                .andExpect(jsonPath("$[1].yearOfRelease", is(1900)))
+                .andExpect(jsonPath("$[2].yearOfRelease", is(2018)))
+                .andExpect(jsonPath("$[0].picturePath", is("path")))
+                .andExpect(jsonPath("$[1].picturePath", is("path")))
+                .andExpect(jsonPath("$[2].picturePath", is("path")));
+
+        verify(movieService, times(1)).findByGenre(Mockito.any(MoviesRequest.class));
+    }
+
+    @Test
+    void findByGenreAndByPageAndPriceAsc() throws Exception {
+        given(movieService.findByGenre(Mockito.any(MoviesRequest.class))).willReturn(movies);
+        mvc.perform(get(baseUrl + "/genre/1?page=1&price=ASC").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].id", is(1)))
+                .andExpect(jsonPath("$[1].id", is(2)))
+                .andExpect(jsonPath("$[2].id", is(3)))
+                .andExpect(jsonPath("$[0].price", is(55.8)))
+                .andExpect(jsonPath("$[1].price", is(111.1)))
+                .andExpect(jsonPath("$[2].price", is(355.0)))
+                .andExpect(jsonPath("$[0].rating", is(7.3)))
+                .andExpect(jsonPath("$[1].rating", is(9.8)))
+                .andExpect(jsonPath("$[2].rating", is(5.5)))
+                .andExpect(jsonPath("$[0].nameRussian", is("Тест один")))
+                .andExpect(jsonPath("$[1].nameRussian", is("Тест два")))
+                .andExpect(jsonPath("$[2].nameRussian", is("Тест три")))
+                .andExpect(jsonPath("$[0].nameNative", is("Test one")))
+                .andExpect(jsonPath("$[1].nameNative", is("Test two")))
+                .andExpect(jsonPath("$[2].nameNative", is("Test three")))
+                .andExpect(jsonPath("$[0].yearOfRelease", is(1900)))
+                .andExpect(jsonPath("$[1].yearOfRelease", is(2000)))
+                .andExpect(jsonPath("$[2].yearOfRelease", is(2018)))
+                .andExpect(jsonPath("$[0].picturePath", is("path")))
+                .andExpect(jsonPath("$[1].picturePath", is("path")))
+                .andExpect(jsonPath("$[2].picturePath", is("path")));
+
+        verify(movieService, times(1)).findByGenre(Mockito.any(MoviesRequest.class));
+    }
+
+    @Test
+    void findByGenreByPageAndPriceDesc() throws Exception {
+        List<MovieDto> descPriceMovies = List.of(tesMovieThree, testMovieTwo, testMovieOne);
+        given(movieService.findByGenre(Mockito.any(MoviesRequest.class))).willReturn(descPriceMovies);
+        mvc.perform(get(baseUrl + "/genre/1?page=1&price=DESC").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[2].id", is(1)))
+                .andExpect(jsonPath("$[1].id", is(2)))
+                .andExpect(jsonPath("$[0].id", is(3)))
+                .andExpect(jsonPath("$[2].price", is(55.8)))
+                .andExpect(jsonPath("$[1].price", is(111.1)))
+                .andExpect(jsonPath("$[0].price", is(355.0)))
+                .andExpect(jsonPath("$[2].rating", is(7.3)))
+                .andExpect(jsonPath("$[1].rating", is(9.8)))
+                .andExpect(jsonPath("$[0].rating", is(5.5)))
+                .andExpect(jsonPath("$[2].nameRussian", is("Тест один")))
+                .andExpect(jsonPath("$[1].nameRussian", is("Тест два")))
+                .andExpect(jsonPath("$[0].nameRussian", is("Тест три")))
+                .andExpect(jsonPath("$[2].nameNative", is("Test one")))
+                .andExpect(jsonPath("$[1].nameNative", is("Test two")))
+                .andExpect(jsonPath("$[0].nameNative", is("Test three")))
+                .andExpect(jsonPath("$[2].yearOfRelease", is(1900)))
+                .andExpect(jsonPath("$[1].yearOfRelease", is(2000)))
+                .andExpect(jsonPath("$[0].yearOfRelease", is(2018)))
+                .andExpect(jsonPath("$[2].picturePath", is("path")))
+                .andExpect(jsonPath("$[1].picturePath", is("path")))
+                .andExpect(jsonPath("$[0].picturePath", is("path")));
+
+        verify(movieService, times(1)).findByGenre(Mockito.any(MoviesRequest.class));
+    }
+
+    @Test
+    void findByGenreReturnBadRequestIfThereAreNoPageInRequest() throws Exception {
+        List<MovieDto> descRatingMovies = List.of(testMovieTwo, testMovieOne, tesMovieThree);
+        given(movieService.findAll(Mockito.any(MoviesRequest.class))).willReturn(descRatingMovies);
+        mvc.perform(get(baseUrl + "/genre/1").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        verify(movieService, times(0)).findByGenre(Mockito.any(MoviesRequest.class));
+    }
 
     @Test
     void findByGenreReturnVoidList() throws Exception {
-        List<Movie> moviesByGenre = new ArrayList<>();
-        given(movieService.findAllByGenre(1, 1)).willReturn(moviesByGenre);
-        mvc.perform(get(baseUrl + "/genre/15?page=15").contentType(MediaType.APPLICATION_JSON))
+        List<MovieDto> moviesByGenre = new ArrayList<>();
+        given(movieService.findByGenre(Mockito.any(MoviesRequest.class))).willReturn(moviesByGenre);
+        mvc.perform(get(baseUrl + "/genre/1?page=0").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        verify(movieService, times(1)).findAllByGenre(15, 15);
+        verify(movieService, times(1)).findByGenre(Mockito.any(MoviesRequest.class));
     }
 
     @Test
-    void findByGenreReturnBadRequest() throws Exception {
-        given(movieService.findAllByGenre(166, 900)).willThrow(new RuntimeException("Exception"));
-        mvc.perform(get(baseUrl + "/genre/166?page=900").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-
-        verify(movieService, times(1)).findAllByGenre(166, 900);
-    }
-
-    @Test
-    void findRandomRetutnListOfMovies() throws Exception {
-        List<Movie> randomMovies = List.of(testMovieOne, testMovieTwo);
+    void findRandomReturnListOfMovies() throws Exception {
+        List<MovieDto> randomMovies = List.of(testMovieOne, testMovieTwo);
         given(movieService.findRandom()).willReturn(randomMovies);
         mvc.perform(get(baseUrl + "/random").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -263,15 +381,6 @@ class MovieControllerTest {
                 .andExpect(jsonPath("$[1].yearOfRelease", is(2000)))
                 .andExpect(jsonPath("$[0].picturePath", is("path")))
                 .andExpect(jsonPath("$[1].picturePath", is("path")));
-
-        verify(movieService, times(1)).findRandom();
-    }
-
-    @Test
-    void findRandomMoviesReturnBadRequest() throws Exception {
-        given(movieService.findRandom()).willThrow(new RuntimeException("Exception"));
-        mvc.perform(get(baseUrl + "/random").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
 
         verify(movieService, times(1)).findRandom();
     }

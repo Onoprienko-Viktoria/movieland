@@ -1,39 +1,45 @@
-package com.onoprienko.movieland.repository.dao.jdbc;
+package com.onoprienko.movieland.repository.jpa;
 
+import com.onoprienko.movieland.common.SortTypeEnum;
 import com.onoprienko.movieland.entity.Movie;
-import com.onoprienko.movieland.repository.dao.MovieDao;
-import com.onoprienko.movieland.repository.dao.jdbc.utils.JdbcDaoTestUtil;
-import com.onoprienko.movieland.service.entity.PageRequest;
-import com.onoprienko.movieland.service.entity.SortEnum;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.mockito.Mockito;
-import org.postgresql.util.PSQLException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class JdbcMovieDaoTest {
-    private DataSource datasource;
-    private MovieDao movieDao;
 
-    @BeforeAll
-    public void init() throws IOException, SQLException {
-        JdbcDaoTestUtil.createTables();
-        datasource = JdbcDaoTestUtil.getDatasource();
-        movieDao = new JdbcMovieDao(datasource);
+@SpringBootTest
+@Testcontainers
+@Sql(value = {"/create-tables-before.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = {"/delete-tables-after.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+class JpaMovieRepositoryTest {
+    @Container
+    private static final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest");
+
+    @DynamicPropertySource
+    public static void overrideProps(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresContainer::getUsername);
+        registry.add("spring.datasource.password", postgresContainer::getPassword);
     }
+
+    @Autowired
+    private JpaMovieRepository repository;
 
     @Test
     void findAllReturnCorrectListOfMovieForPageZero() {
-        List<Movie> all = movieDao.findAll(PageRequest.builder().page(0).capacity(3).build());
+        List<Movie> all = repository.findAll(PageRequest.of(0, 3)).getContent();
 
         assertNotNull(all);
 
@@ -70,43 +76,18 @@ class JdbcMovieDaoTest {
 
     @Test
     void findAllReturnCorrectListOfMovieForPageThatVoid() {
-        List<Movie> all = movieDao.findAll(PageRequest.builder().page(100000).capacity(3).build());
+        List<Movie> all = repository.findAll(PageRequest.of(100000, 3)).getContent();
 
         assertNotNull(all);
         assertTrue(all.isEmpty());
     }
-
-    @Test
-    void findAllReturnCorrectListOfMovieForCapacityZero() {
-        List<Movie> all = movieDao.findAll(PageRequest.builder().page(1).capacity(0).build());
-
-        assertNotNull(all);
-        assertTrue(all.isEmpty());
-    }
-
-    @Test
-    void findAllReturnCorrectListOfMovieForNullPage() {
-        assertThrows(NullPointerException.class, () -> movieDao.findAll(
-                PageRequest.builder().page(null).capacity(3).build()));
-    }
-
-    @Test
-    void findAllReturnCorrectListOfMovieForNullCapacity() {
-        assertThrows(NullPointerException.class, () -> movieDao.findAll(
-                PageRequest.builder().page(5).capacity(null).build()));
-    }
-
-
-    @Test
-    void findAllReturnCorrectListOfMovieForNullRequest() {
-        assertThrows(NullPointerException.class, () -> movieDao.findAll(null));
-    }
-
 
     @Test
     void findAllByRatingReturnCorrectValues() {
-        List<Movie> all = movieDao.findAllByRating(
-                PageRequest.builder().page(0).capacity(3).build());
+        List<Movie> all = repository.findAll(
+                        PageRequest.of(0, 3,
+                                Sort.by(SortTypeEnum.RATING.name().toLowerCase()).descending()))
+                .getContent();
 
 
         assertNotNull(all);
@@ -144,37 +125,11 @@ class JdbcMovieDaoTest {
 
 
     @Test
-    void findAllByRatingReturnExceptionOnNullRequest() {
-        assertThrows(NullPointerException.class, () -> movieDao.findAllByRating(null));
-    }
-
-    @Test
-    void findAllByRatingReturnExceptionOnNullCapacity() {
-        assertThrows(NullPointerException.class, () -> movieDao.findAllByRating(PageRequest.builder().page(2).build()));
-    }
-
-    @Test
-    void findAllByRatingReturnExceptionOnNullPage() {
-        assertThrows(NullPointerException.class, () -> movieDao.findAllByRating(PageRequest.builder().capacity(2).build()));
-    }
-
-
-    @Test
-    void findAllByRatingReturnVoidList() {
-        List<Movie> all = movieDao.findAllByRating(
-                PageRequest.builder().page(0).capacity(0).build());
-
-
-        assertNotNull(all);
-
-        assertTrue(all.isEmpty());
-    }
-
-
-    @Test
     void findAllByPriceDescReturnCorrectList() {
-        List<Movie> all = movieDao.findAllByPrice(PageRequest.builder()
-                .page(0).capacity(3).build(), SortEnum.DESC);
+        List<Movie> all = repository.findAll(PageRequest.of(0, 3,
+                        Sort.by(SortTypeEnum.PRICE.name().toLowerCase()).descending()))
+                .getContent();
+        ;
 
 
         assertNotNull(all);
@@ -214,8 +169,9 @@ class JdbcMovieDaoTest {
 
     @Test
     void findAllByPriceAscReturnCorrectList() {
-        List<Movie> all = movieDao.findAllByPrice(PageRequest.builder()
-                .page(0).capacity(3).build(), SortEnum.ASC);
+        List<Movie> all = repository.findAll(PageRequest.of(0, 3,
+                        Sort.by(SortTypeEnum.PRICE.name().toLowerCase()).ascending()))
+                .getContent();
 
 
         assertNotNull(all);
@@ -254,50 +210,9 @@ class JdbcMovieDaoTest {
 
 
     @Test
-    void findAllByPriceReturnVoidList() {
-        List<Movie> all = movieDao.findAllByPrice(PageRequest.builder()
-                .page(0).capacity(0).build(), SortEnum.ASC);
-
-
-        assertNotNull(all);
-
-        assertEquals(all.size(), 0);
-    }
-
-
-    @Test
-    void findAllByPriceReturnExceptionOnNullPage() {
-        assertThrows(NullPointerException.class, () -> movieDao.findAllByPrice(PageRequest.builder()
-                .page(null).capacity(0).build(), SortEnum.ASC));
-    }
-
-    @Test
-    void findAllByPriceReturnExceptionOnNullCapacity() {
-        assertThrows(NullPointerException.class, () -> movieDao.findAllByPrice(PageRequest.builder()
-                .page(2).capacity(null).build(), SortEnum.ASC));
-    }
-
-    @Test
-    void findAllByPriceReturnExceptionOnNullRequest() {
-        assertThrows(NullPointerException.class, () -> movieDao.findAllByPrice(null, SortEnum.ASC));
-    }
-
-    @Test
-    void findAllByPriceReturnExceptionOnNullSort() {
-        assertThrows(NullPointerException.class, () -> movieDao.findAllByPrice(PageRequest.builder()
-                .page(1).capacity(2).build(), null));
-    }
-
-
-    @Test
-    void findAllByPriceReturnExceptionOnNoneSort() {
-        assertThrows(PSQLException.class, () -> movieDao.findAllByPrice(PageRequest.builder()
-                .page(1).capacity(2).build(), SortEnum.NONE));
-    }
-
-    @Test
     void findAllByGenreDramaReturnCorrectList() {
-        List<Movie> all = movieDao.findAllByGenre(1, PageRequest.builder().page(0).capacity(3).build());
+        List<Movie> all = repository.findByGenreId(1L,
+                PageRequest.of(0, 3));
 
         assertNotNull(all);
 
@@ -335,7 +250,8 @@ class JdbcMovieDaoTest {
 
     @Test
     void findAllByGenreWesternReturnCorrectList() {
-        List<Movie> all = movieDao.findAllByGenre(15, PageRequest.builder().page(0).capacity(3).build());
+        List<Movie> all = repository.findByGenreId(15L,
+                PageRequest.of(0, 3));
 
         assertNotNull(all);
 
@@ -373,78 +289,28 @@ class JdbcMovieDaoTest {
 
     @Test
     void findAllByGenreThatDontExist() {
-        List<Movie> all = movieDao.findAllByGenre(173, PageRequest.builder().page(0).capacity(3).build());
+        List<Movie> all = repository.findByGenreId(1123L,
+                PageRequest.of(0, 3));
 
         assertNotNull(all);
         assertTrue(all.isEmpty());
     }
-
-
-    @Test
-    void findAllByGenreThrowExceptionIfGenreNull() {
-        assertThrows(NullPointerException.class, () ->
-                movieDao.findAllByGenre(null, PageRequest.builder().page(0).capacity(3).build()));
-    }
-
 
     @Test
     void findAllByGenreReturnVoidListIfGenreIdMinusInt() {
-        List<Movie> all = movieDao.findAllByGenre(-1, PageRequest.builder().page(0).capacity(3).build());
+        List<Movie> all = repository.findByGenreId(-1L,
+                PageRequest.of(0, 3));
 
         assertNotNull(all);
         assertTrue(all.isEmpty());
-    }
-
-
-    @Test
-    void findAllByGenreThrowExceptionIfPageNull() {
-        assertThrows(NullPointerException.class, () ->
-                movieDao.findAllByGenre(12, PageRequest.builder().page(null).capacity(3).build()));
-    }
-
-
-    @Test
-    void findAllByGenreThrowExceptionIfCapacityNull() {
-        assertThrows(NullPointerException.class, () ->
-                movieDao.findAllByGenre(12, PageRequest.builder().page(1).capacity(null).build()));
-    }
-
-    @Test
-    void findAllByGenreThrowExceptionIfRequestNull() {
-        assertThrows(NullPointerException.class, () ->
-                movieDao.findAllByGenre(12, PageRequest.builder().page(1).capacity(null).build()));
     }
 
     @Test
     void findAllByGenreReturnVoidList() {
-        List<Movie> all = movieDao.findAllByGenre(12, PageRequest.builder().page(3).capacity(10).build());
+        List<Movie> all = repository.findByGenreId(12L,
+                PageRequest.of(100, 3));
 
         assertNotNull(all);
         assertTrue(all.isEmpty());
-    }
-
-    @Test
-    void getCountReturnCorrectCount() {
-        MovieDao movieDao = new JdbcMovieDao(datasource);
-
-        Integer count = movieDao.getCount();
-
-        assertNotNull(count);
-
-        assertEquals(count, 25);
-    }
-
-    @Test
-    void getCountReturnException() throws SQLException {
-        DataSource datasource = Mockito.mock(DataSource.class);
-        Mockito.when(datasource.getConnection()).thenThrow(new SQLException());
-        MovieDao movieDaoMock = new JdbcMovieDao(datasource);
-
-        assertThrows(SQLException.class, movieDaoMock::getCount);
-    }
-
-    @AfterAll
-    public void afterAll() throws IOException, SQLException {
-        JdbcDaoTestUtil.dropTables();
     }
 }

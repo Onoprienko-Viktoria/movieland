@@ -25,10 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class GenreControllerTest {
     @Autowired
     private MockMvc mvc;
-
     @MockBean
     private GenreService genreService;
-
     private final String baseUrl = "/api/v1/genre/";
 
     @Test
@@ -60,15 +58,6 @@ class GenreControllerTest {
         mvc.perform(get(baseUrl).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
-        verify(genreService, times(1)).findAll();
-    }
-
-
-    @Test
-    void findAllReturnBadRequest() throws Exception {
-        given(genreService.findAll()).willThrow(new RuntimeException("Exception"));
-        mvc.perform(get(baseUrl).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
         verify(genreService, times(1)).findAll();
     }
 

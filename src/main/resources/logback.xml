@@ -1,5 +1,5 @@
 <configuration>
-    <property name="LOG_ROOT" value="C:\study\movieland\logs"/>
+    <property name="LOG_ROOT" value="\movieland\logs"/>
     <property name="LOG_FILE_NAME" value="movieland"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">

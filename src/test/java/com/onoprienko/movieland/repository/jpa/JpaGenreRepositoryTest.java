@@ -1,35 +1,42 @@
-package com.onoprienko.movieland.repository.dao.jdbc;
+package com.onoprienko.movieland.repository.jpa;
 
 import com.onoprienko.movieland.entity.Genre;
-import com.onoprienko.movieland.repository.dao.GenreDao;
-import com.onoprienko.movieland.repository.dao.jdbc.utils.JdbcDaoTestUtil;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class JdbcGenreDaoTest {
+@SpringBootTest
+@Testcontainers
+@Sql(value = {"/create-tables-before.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = {"/delete-tables-after.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+class JpaGenreRepositoryTest {
+    @Container
+    private static final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest");
 
-    @BeforeAll
-    public void init() throws IOException, SQLException {
-        JdbcDaoTestUtil.createTables();
+    @DynamicPropertySource
+    public static void overrideProps(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresContainer::getUsername);
+        registry.add("spring.datasource.password", postgresContainer::getPassword);
     }
+
+    @Autowired
+    private JpaGenreRepository genreRepository;
 
     @Test
     void findAll() {
-        DataSource datasource = JdbcDaoTestUtil.getDatasource();
-        GenreDao genreDao = new JdbcGenreDao(datasource);
-
-        List<Genre> all = genreDao.findAll();
+        List<Genre> all = genreRepository.findAll();
 
         assertNotNull(all);
 
@@ -65,20 +72,5 @@ class JdbcGenreDaoTest {
         assertEquals(all.get(12).getName(), "мультфильм");
         assertEquals(all.get(13).getName(), "семейный");
         assertEquals(all.get(14).getName(), "вестерн");
-    }
-
-
-    @Test
-    void findAllReturnException() throws SQLException {
-        DataSource datasource = Mockito.mock(DataSource.class);
-        Mockito.when(datasource.getConnection()).thenThrow(new SQLException());
-        GenreDao genreDao = new JdbcGenreDao(datasource);
-
-        assertThrows(SQLException.class, genreDao::findAll);
-    }
-
-    @AfterAll
-    public void afterAll() throws IOException, SQLException {
-        JdbcDaoTestUtil.dropTables();
     }
 }
