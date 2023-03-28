@@ -1,12 +1,11 @@
 package com.onoprienko.movieland.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
+@Setter
 @Builder
 @ToString
 public class MovieDto {

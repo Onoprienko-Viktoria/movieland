@@ -60,7 +60,7 @@ class JpaGenreRepositoryTest {
         assertEquals("драма", all.get(0).getName());
         assertEquals("криминал", all.get(1).getName());
         assertEquals("фэнтези", all.get(2).getName());
-        assertEquals("детектив", all.get(3).getName(), "детектив");
+        assertEquals("детектив", all.get(3).getName());
         assertEquals("мелодрама", all.get(4).getName());
         assertEquals("биография", all.get(5).getName());
         assertEquals("комедия", all.get(6).getName());

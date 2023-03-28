@@ -82,4 +82,28 @@ class MovieMapperTest {
 
         assertNull(result);
     }
+
+    @Test
+    void testMapSingleMovieToMovieDto() {
+        Movie testMovie = Movie.builder()
+                .id(1L)
+                .price(55.8)
+                .rating(7.3)
+                .nameRussian("Тест один")
+                .nameNative("Test one")
+                .yearOfRelease(1900)
+                .picturePath("path")
+                .build();
+        MovieMapper movieMapper = Mappers.getMapper(MovieMapper.class);
+        MovieDto movieOne = movieMapper.mapToMovieDto(testMovie);
+
+        assertEquals(1, movieOne.getId());
+        assertEquals(55.8, movieOne.getPrice());
+        assertEquals(7.3, movieOne.getRating());
+        assertEquals("Test one", movieOne.getNameNative());
+        assertEquals("Тест один", movieOne.getNameRussian());
+        assertEquals(1900, movieOne.getYearOfRelease());
+        assertEquals("path", movieOne.getPicturePath());
+
+    }
 }
