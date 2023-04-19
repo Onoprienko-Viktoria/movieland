@@ -1,6 +1,6 @@
 package com.onoprienko.movieland.repository.jpa;
 
-import com.onoprienko.movieland.common.SortTypeEnum;
+import com.onoprienko.movieland.common.SortType;
 import com.onoprienko.movieland.entity.Movie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +86,7 @@ class JpaMovieRepositoryTest {
     void findAllByRatingReturnCorrectValues() {
         List<Movie> all = repository.findAll(
                         PageRequest.of(0, 3,
-                                Sort.by(SortTypeEnum.RATING.name().toLowerCase()).descending()))
+                                Sort.by(SortType.RATING.name().toLowerCase()).descending()))
                 .getContent();
 
 
@@ -127,7 +127,7 @@ class JpaMovieRepositoryTest {
     @Test
     void findAllByPriceDescReturnCorrectList() {
         List<Movie> all = repository.findAll(PageRequest.of(0, 3,
-                        Sort.by(SortTypeEnum.PRICE.name().toLowerCase()).descending()))
+                        Sort.by(SortType.PRICE.name().toLowerCase()).descending()))
                 .getContent();
         ;
 
@@ -161,7 +161,7 @@ class JpaMovieRepositoryTest {
     @Test
     void findAllByPriceAscReturnCorrectList() {
         List<Movie> all = repository.findAll(PageRequest.of(0, 3,
-                        Sort.by(SortTypeEnum.PRICE.name().toLowerCase()).ascending()))
+                        Sort.by(SortType.PRICE.name().toLowerCase()).ascending()))
                 .getContent();
 
 

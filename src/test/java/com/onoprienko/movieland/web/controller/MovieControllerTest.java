@@ -1,6 +1,6 @@
 package com.onoprienko.movieland.web.controller;
 
-import com.onoprienko.movieland.common.MoviesRequest;
+import com.onoprienko.movieland.common.request.MoviesRequest;
 import com.onoprienko.movieland.dto.MovieDto;
 import com.onoprienko.movieland.service.MovieService;
 import org.junit.jupiter.api.Test;

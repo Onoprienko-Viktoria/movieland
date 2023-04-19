@@ -1,5 +1,6 @@
-package com.onoprienko.movieland.common;
+package com.onoprienko.movieland.common.request;
 
+import com.onoprienko.movieland.common.SortDirection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.Getter;
 @Builder
 public class MoviesRequest {
     private int page;
-    private SortDirectionEnum ratingDirection;
-    private SortDirectionEnum priceDirection;
+    private SortDirection ratingDirection;
+    private SortDirection priceDirection;
     private long genreId;
 }

@@ -3,6 +3,7 @@ package com.onoprienko.movieland.repository.cache;
 import com.onoprienko.movieland.entity.Genre;
 import com.onoprienko.movieland.repository.GenreRepository;
 import com.onoprienko.movieland.repository.jpa.JpaGenreRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,6 +19,7 @@ public class CachedGenreRepository implements GenreRepository {
     private final JpaGenreRepository jpaGenreRepository;
 
     @Scheduled(fixedRateString = "${timing.updateData.genre}")
+    @PostConstruct
     public void updateGenreCache() {
         genreCache = jpaGenreRepository.findAll();
         log.info("Update genre cache {}", genreCache);
@@ -28,4 +30,13 @@ public class CachedGenreRepository implements GenreRepository {
         return genreCache;
     }
 
+    @Override
+    public List<Genre> findByIdIn(List<Long> ids) {
+        return jpaGenreRepository.findByIdIn(ids);
+    }
+
+    @Override
+    public List<Genre> findByMovieId(Long id) {
+        return jpaGenreRepository.findByMovieId(id);
+    }
 }

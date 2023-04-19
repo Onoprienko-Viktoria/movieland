@@ -3,6 +3,6 @@ package com.onoprienko.movieland.common;
 import lombok.Getter;
 
 @Getter
-public enum SortDirectionEnum {
+public enum SortDirection {
     ASC, DESC, NONE
 }

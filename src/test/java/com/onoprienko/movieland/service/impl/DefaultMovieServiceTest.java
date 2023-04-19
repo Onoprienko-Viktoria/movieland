@@ -1,11 +1,17 @@
 package com.onoprienko.movieland.service.impl;
 
-import com.onoprienko.movieland.common.MoviesRequest;
-import com.onoprienko.movieland.common.SortDirectionEnum;
+import com.onoprienko.movieland.common.request.MoviesRequest;
+import com.onoprienko.movieland.common.SortDirection;
 import com.onoprienko.movieland.dto.MovieDto;
 import com.onoprienko.movieland.entity.Movie;
+import com.onoprienko.movieland.entity.Review;
 import com.onoprienko.movieland.mapper.MovieMapper;
+import com.onoprienko.movieland.repository.cache.CachedMovieRepository;
 import com.onoprienko.movieland.repository.jpa.JpaMovieRepository;
+import com.onoprienko.movieland.service.CountryService;
+import com.onoprienko.movieland.service.GenreService;
+import com.onoprienko.movieland.service.ReviewService;
+import com.onoprienko.movieland.service.utils.CurrencyConverter;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
@@ -40,7 +46,12 @@ class DefaultMovieServiceTest {
 
 
     JpaMovieRepository repository = Mockito.mock(JpaMovieRepository.class);
-    DefaultMovieService movieService = new DefaultMovieService(repository, Mappers.getMapper(MovieMapper.class));
+    GenreService genreService = Mockito.mock(GenreService.class);
+    CountryService countryService = Mockito.mock(CountryService.class);
+    ReviewService reviewService = Mockito.mock(ReviewService.class);
+    CurrencyConverter currencyConverter = Mockito.mock(CurrencyConverter.class);
+    CachedMovieRepository cachedMovieRepository = Mockito.mock(CachedMovieRepository.class);
+    DefaultMovieService movieService = new DefaultMovieService(repository, genreService, countryService, reviewService, currencyConverter,  cachedMovieRepository, Mappers.getMapper(MovieMapper.class));
 
 
     @Test
@@ -90,7 +101,7 @@ class DefaultMovieServiceTest {
         ).thenReturn(new PageImpl<>(List.of(testMovieTwo, testMovieOne)));
         MoviesRequest moviesRequest = MoviesRequest.builder()
                 .page(1)
-                .ratingDirection(SortDirectionEnum.ASC)
+                .ratingDirection(SortDirection.ASC)
                 .build();
         movieService.setDefaultPageSize(10);
 
@@ -134,7 +145,7 @@ class DefaultMovieServiceTest {
         ).thenReturn(new PageImpl<>(movies));
         MoviesRequest moviesRequest = MoviesRequest.builder()
                 .page(1)
-                .priceDirection(SortDirectionEnum.ASC)
+                .priceDirection(SortDirection.ASC)
                 .build();
         movieService.setDefaultPageSize(10);
         List<MovieDto> all = movieService.findAll(moviesRequest);
@@ -175,7 +186,7 @@ class DefaultMovieServiceTest {
         ).thenReturn(new PageImpl<>(List.of(testMovieTwo, testMovieOne)));
         MoviesRequest moviesRequest = MoviesRequest.builder()
                 .page(1)
-                .priceDirection(SortDirectionEnum.DESC)
+                .priceDirection(SortDirection.DESC)
                 .build();
         movieService.setDefaultPageSize(10);
 
@@ -218,8 +229,8 @@ class DefaultMovieServiceTest {
         ).thenReturn(new PageImpl<>(movies));
         MoviesRequest moviesRequest = MoviesRequest.builder()
                 .page(1)
-                .priceDirection(SortDirectionEnum.DESC)
-                .ratingDirection(SortDirectionEnum.ASC)
+                .priceDirection(SortDirection.DESC)
+                .ratingDirection(SortDirection.ASC)
                 .build();
         movieService.setDefaultPageSize(10);
 

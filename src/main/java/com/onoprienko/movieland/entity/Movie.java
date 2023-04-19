@@ -28,10 +28,17 @@ public class Movie {
     private String picturePath;
     private String description;
     @ToString.Exclude
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "movie_genre",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres = new ArrayList<>();
+
+    @ToString.Exclude
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "movie_countries",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "countries_id"))
+    private List<Country> countries = new ArrayList<>();
 
 }
