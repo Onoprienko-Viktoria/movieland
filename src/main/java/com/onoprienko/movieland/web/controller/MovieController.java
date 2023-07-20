@@ -11,6 +11,7 @@ import com.onoprienko.movieland.dto.MovieWithDetailsDto;
 import com.onoprienko.movieland.service.MovieService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,11 +65,13 @@ public class MovieController {
     }
 
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     public void add(@RequestBody AddMovieRequest request) {
         movieService.add(request);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void edit(@RequestBody EditMovieRequest request,
                      @PathVariable long id) {
         request.setMovieId(id);

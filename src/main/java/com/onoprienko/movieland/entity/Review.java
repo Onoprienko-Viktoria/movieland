@@ -1,5 +1,6 @@
 package com.onoprienko.movieland.entity;
 
+import com.onoprienko.movieland.entity.security.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,7 +21,7 @@ public class Review {
     private String text;
 
     @ToString.Exclude
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "movie_id")
     private Movie movie;
 

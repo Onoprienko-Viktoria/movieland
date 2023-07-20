@@ -29,6 +29,6 @@ public class DefaultCountryService implements CountryService {
 
     @Override
     public List<CountryDto> findByMovieId(Long movieId) {
-        return null;
+        return findByMovieId(movieId);
     }
 }

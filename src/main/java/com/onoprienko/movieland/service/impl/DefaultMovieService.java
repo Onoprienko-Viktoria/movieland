@@ -7,18 +7,16 @@ import com.onoprienko.movieland.common.request.AddMovieRequest;
 import com.onoprienko.movieland.common.request.EditMovieRequest;
 import com.onoprienko.movieland.common.request.MovieByIdRequest;
 import com.onoprienko.movieland.common.request.MoviesRequest;
-import com.onoprienko.movieland.dto.*;
+import com.onoprienko.movieland.common.utils.CurrencyConverter;
+import com.onoprienko.movieland.dto.MovieDto;
+import com.onoprienko.movieland.dto.MovieWithDetailsDto;
 import com.onoprienko.movieland.entity.Country;
 import com.onoprienko.movieland.entity.Genre;
 import com.onoprienko.movieland.entity.Movie;
 import com.onoprienko.movieland.mapper.MovieMapper;
-import com.onoprienko.movieland.repository.cache.CachedMovieRepository;
 import com.onoprienko.movieland.repository.jpa.JpaMovieRepository;
-import com.onoprienko.movieland.service.CountryService;
-import com.onoprienko.movieland.service.GenreService;
+import com.onoprienko.movieland.service.EnrichmentService;
 import com.onoprienko.movieland.service.MovieService;
-import com.onoprienko.movieland.service.ReviewService;
-import com.onoprienko.movieland.service.utils.CurrencyConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -26,28 +24,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @Service
 @RequiredArgsConstructor
 public class DefaultMovieService implements MovieService {
     private final JpaMovieRepository jpaMovieRepository;
-    private final GenreService genreService;
-    private final CountryService countryService;
-    private final ReviewService reviewService;
+
+    private final EnrichmentService enrichmentService;
     private final CurrencyConverter currencyConverter;
-    private final CachedMovieRepository cachedMovieRepository;
     private final MovieMapper movieMapper;
 
-    @Value("${movie.enrichment.timeout.seconds}")
-    private int timeoutSeconds;
     private int defaultPageSize;
 
     @Override
@@ -69,30 +58,24 @@ public class DefaultMovieService implements MovieService {
 
     @Override
     public MovieWithDetailsDto findById(MovieByIdRequest request) {
-        Optional<MovieWithDetailsDto> movieOptional = cachedMovieRepository.getById(request.getMovieId());
+        Movie movie = jpaMovieRepository.findById(request.getMovieId()).orElseThrow();
         MovieWithDetailsDto resultMovie;
+        resultMovie = enrichmentService.enrichMovie(movie);
 
-        if (movieOptional.isEmpty()) {
-            resultMovie = enrichMovie(request.getMovieId());
-            cachedMovieRepository.cacheMovie(resultMovie);
-        } else {
-            resultMovie = movieOptional.get();
-        }
-
+        resultMovie.setCurrencyCode(CurrencyCode.UAH);
         if (request.getCurrencyCode() != null) {
-            Double price = currencyConverter.convertPrice(resultMovie.getPrice(), request.getCurrencyCode());
+            Double price = currencyConverter.convertPriceFromUAH(resultMovie.getPrice(), request.getCurrencyCode());
             resultMovie.setCurrencyCode(request.getCurrencyCode());
             resultMovie.setPrice(price);
         }
-        resultMovie.setCurrencyCode(CurrencyCode.UAH);
         return resultMovie;
     }
 
     @Override
     public void add(AddMovieRequest request) {
         Movie movie = movieMapper.mapToMovie(request);
-        List<Genre> genres = genreService.findAllByIdIn(request.getGenres());
-        List<Country> countries = countryService.findAllByIdIn(request.getCountries());
+        List<Genre> genres = enrichmentService.enrichGenres(request.getGenresIds());
+        List<Country> countries = enrichmentService.enrichCountries(request.getCountriesIds());
         movie.setGenres(genres);
         movie.setCountries(countries);
         jpaMovieRepository.save(movie);
@@ -120,11 +103,11 @@ public class DefaultMovieService implements MovieService {
             movie.setPicturePath(request.getPicturePath());
         }
         if (request.getGenres() != null) {
-            List<Genre> genres = genreService.findAllByIdIn(request.getGenres());
+            List<Genre> genres = enrichmentService.enrichGenres(request.getGenres());
             movie.setGenres(genres);
         }
         if (request.getCountries() != null) {
-            List<Country> countries = countryService.findAllByIdIn(request.getCountries());
+            List<Country> countries = enrichmentService.enrichCountries(request.getCountries());
             movie.setCountries(countries);
         }
     }
@@ -151,33 +134,6 @@ public class DefaultMovieService implements MovieService {
         return sort;
     }
 
-    MovieWithDetailsDto enrichMovie(Long movieId) {
-        CompletableFuture<Movie> movieFuture = CompletableFuture.supplyAsync(jpaMovieRepository.findById(movieId)::get);
-        CompletableFuture<List<GenreDto>> genresFuture = CompletableFuture.supplyAsync(() -> genreService.findByMovieId(movieId));
-        CompletableFuture<List<CountryDto>> countriesFuture = CompletableFuture.supplyAsync(() -> countryService.findByMovieId(movieId));
-        CompletableFuture<List<ReviewDto>> reviewsFuture = CompletableFuture.supplyAsync(() -> reviewService.findByMovieId(movieId));
-
-        try {
-            CompletableFuture.allOf(movieFuture, genresFuture, countriesFuture, reviewsFuture)
-                    .get(timeoutSeconds, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            cancelFuture(genresFuture);
-            cancelFuture(countriesFuture);
-            cancelFuture(reviewsFuture);
-        }
-
-        MovieWithDetailsDto enrichedMovie = movieMapper.mapToMovieWithDetailsDto(movieFuture.join());
-        enrichedMovie.setGenres(genresFuture.getNow(new ArrayList<>()));
-        enrichedMovie.setCountries(countriesFuture.getNow(new ArrayList<>()));
-        enrichedMovie.setReviews(reviewsFuture.getNow(new ArrayList<>()));
-        return enrichedMovie;
-    }
-
-    void cancelFuture(CompletableFuture<?> future) {
-        if (!future.isDone()) {
-            future.cancel(true);
-        }
-    }
 
     @Value("${movie.page.size}")
     public void setDefaultPageSize(int defaultPageSize) {

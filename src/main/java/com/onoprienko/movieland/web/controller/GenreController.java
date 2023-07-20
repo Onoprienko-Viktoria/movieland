@@ -1,6 +1,6 @@
 package com.onoprienko.movieland.web.controller;
 
-import com.onoprienko.movieland.entity.Genre;
+import com.onoprienko.movieland.dto.GenreDto;
 import com.onoprienko.movieland.service.GenreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,8 @@ public class GenreController {
     private final GenreService genreService;
 
     @GetMapping()
-    public List<Genre> findAll() {
+    public List<GenreDto> findAll() {
         return genreService.findAll();
     }
+
 }

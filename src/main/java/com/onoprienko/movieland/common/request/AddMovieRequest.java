@@ -16,6 +16,6 @@ public class AddMovieRequest {
     private String description;
     private Double price;
     private String picturePath;
-    private List<Integer> countries;
-    private List<Long> genres;
+    private List<Integer> countriesIds;
+    private List<Long> genresIds;
 }

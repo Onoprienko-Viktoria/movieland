@@ -37,6 +37,12 @@ public class DefaultReviewService implements ReviewService {
 
     @Override
     public List<ReviewDto> findByMovieId(Long movieId) {
+//        for (int i = 0; i < 999999999; i++) {
+//            i++;
+//            for (int j = 0; j < 999999999; j++) {
+//                j++;
+//            }
+//        }
         return reviewMapper.mapToReviewDtoList(reviewRepository.findByMovieId(movieId));
     }
 }
